@@ -1,1 +1,172 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>გოგოური ლოგიკა 😂</title>
+    <style>
+        /* საბაზისო პარამეტრები */
+        * {
+            box-sizing: border-box;
+        }
 
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* შეცვლილი, ახალი ბექგრაუნდი (მხიარული გრადიენტი) */
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); 
+            overflow: hidden; /* კრძალავს ეკრანის სქროლვას */
+            text-align: center;
+            touch-action: none; /* მობილურზე თითის მოძრაობით ეკრანის გაწევას კრძალავს */
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin: 0 20px 40px 20px;
+        }
+
+        .button-wrapper {
+            display: flex;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            /* ანიმაცია დარბენის დროს */
+            transition: left 0.2s ease-out, top 0.2s ease-out, transform 0.1s; 
+        }
+
+        #noBtn {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        #noBtn:active {
+            transform: scale(0.95);
+        }
+
+        #yesBtn {
+            background-color: #ff4757;
+            color: white;
+            position: relative; /* თავიდან ჩვეულებრივად ზის */
+        }
+
+        #message {
+            display: none;
+            margin-top: 30px;
+            font-size: 2rem;
+            color: #ffffff;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* მობილურისთვის მორგებული დიზაინი */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .btn { padding: 15px 30px; font-size: 1.3rem; }
+            #message { font-size: 1.6rem; }
+            .button-wrapper {
+                flex-direction: column; /* მობილურზე ღილაკები ერთმანეთის ქვეშ იქნება */
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1 id="title">გოგოებს მიზეზი როდისმე დაგელევათ?! 🤔</h1>
+    
+    <div class="button-wrapper" id="btnWrapper">
+        <button id="noBtn" class="btn">არა</button>
+        <button id="yesBtn" class="btn">კი</button>
+    </div>
+
+    <div id="message">რა თქმა უნდა არ დაგელევათ! 😂🤷‍♀️</div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const message = document.getElementById('message');
+        const title = document.getElementById('title');
+        let isMoving = false;
+
+        function runawayBtn() {
+            // პირველივე გაქცევაზე ღილაკს ვხსნით საერთო განლაგებიდან
+            if (!isMoving) {
+                yesBtn.style.position = 'fixed';
+                isMoving = true;
+            }
+
+            // ეკრანის რეალური ზომები
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            // ღილაკის ზომები
+            const btnWidth = yesBtn.offsetWidth;
+            const btnHeight = yesBtn.offsetHeight;
+
+            // უსაფრთხოების ზღვარი (რამდენი პიქსელით იყოს დაშორებული კედლიდან)
+            const margin = 10; 
+            
+            // მაქსიმალური დაშვებული კოორდინატები (რომ ეკრანს არ გაცდეს)
+            const maxX = windowWidth - btnWidth - margin;
+            const maxY = windowHeight - btnHeight - margin;
+
+            // ვირჩევთ შემთხვევით ადგილს უსაფრთხო ზონაში
+            const randomX = Math.max(margin, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(margin, Math.floor(Math.random() * maxY));
+
+            // ვსვამთ ახალ ადგილას
+            yesBtn.style.left = randomX + 'px';
+            yesBtn.style.top = randomY + 'px';
+        }
+
+        // კომპიუტერზე: მაუსის მიტანისას
+        yesBtn.addEventListener('mouseenter', runawayBtn);
+        
+        // მობილურზე: შეხების მცდელობისას
+        // {passive: false} აუცილებელია, რომ preventDefault()-მა იმუშავოს ტელეფონებზე
+        yesBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault(); 
+            runawayBtn();
+        }, { passive: false });
+
+        // მაინც თუ როგორმე დააკლიკა (მაგ. Enter-ით), მაინც გარბის
+        yesBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            runawayBtn();
+        });
+
+        // "არა"-ზე დაჭერის ფუნქცია
+        noBtn.addEventListener('click', function() {
+            message.style.display = 'block';
+            noBtn.style.display = 'none';
+            yesBtn.style.display = 'none'; // კი ღილაკიც გავაქროთ ბოლოს
+            title.style.display = 'none'; // სათაურიც ქრება, რომ ფოკუსი ტექსტზე იყოს
+        });
+    </script>
+
+</body>
+</html>
