@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>პერსონალური ფაილების მენეჯერი</title>
+    <title>ShogiDocuments</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- SheetJS Excel წამკითხველი -->
@@ -803,8 +803,8 @@
     <!-- ავტორიზაციის გვერდი -->
     <div id="loginView" class="login-wrapper">
         <div class="login-card">
-            <h2>მოგესალმებით</h2>
-            <p>გთხოვთ გაიაროთ ავტორიზაცია სისტემაში შესასვლელად</p>
+            <h2>ShogiDocuments</h2>
+            <p>გაიარეთ ავტორიზაცია</p>
             <div class="form-group">
                 <label for="usernameInput">მომხმარებელი</label>
                 <input type="text" id="usernameInput" placeholder="შეიყვანეთ სახელი">
@@ -823,18 +823,17 @@
             <div class="header-title" onclick="refreshData()" title="მონაცემების განახლება">
                 <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 <div>
-                    <h1>პერსონალური ფაილების მენეჯერი</h1>
-                    <p>შეინახეთ, დაახარისხეთ და გახსენით ფაილები უსაფრთხოდ (დააკლიკეთ განახლებისთვის)</p>
+                    <h1>ShogiDocuments</h1>
                 </div>
             </div>
             <div class="header-actions">
                 <div class="search-box-wrapper">
                     <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                    <input type="text" id="searchInput" class="search-input" placeholder="ძებნა სათაურით ან კატეგორიით..." oninput="handleSearch(event)">
+                    <input type="text" id="searchInput" class="search-input" placeholder="" oninput="handleSearch(event)">
                 </div>
                 <button class="btn" onclick="openUploadModal()">
                     <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                    ფაილის დამატება
+                    დამატება
                 </button>
                 <button class="btn btn-danger" onclick="handleLogout()">გასვლა</button>
             </div>
@@ -844,7 +843,7 @@
             <div id="locationsContainer">
                 <div class="spinner-container" style="padding: 60px;">
                     <div class="spinner"></div>
-                    <span>იტვირთება ფაილები...</span>
+                    <span>იტვირთება...</span>
                 </div>
             </div>
         </div>
@@ -854,18 +853,18 @@
     <div class="modal" id="uploadModal">
         <div class="modal-content upload-modal">
             <div class="modal-header">
-                <h3>ახალი ფაილის ატვირთვა</h3>
+                <h3>ფაილის ატვირთვა</h3>
                 <button class="close-btn" onclick="closeUploadModal()">
                     <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
             </div>
             <div class="modal-body upload-body" id="uploadModalBody">
                 <div class="form-group">
-                    <label for="fileTitle">ფაილის სათაური</label>
+                    <label for="fileTitle">სათაური</label>
                     <input type="text" id="fileTitle" placeholder="მაგ: პასპორტის ასლი">
                 </div>
                 <div class="form-group">
-                    <label for="fileLocation">ადგილი / კატეგორია</label>
+                    <label for="fileLocation">კატეგორია</label>
                     <div style="position: relative; display: flex; align-items: center;">
                         <input type="text" id="fileLocation" placeholder="აირჩიეთ არსებული ან აკრიფეთ ახალი კატეგორია" autocomplete="off" style="background: #ffffff; padding-right: 40px;" onfocus="openCategoryDropdown()" oninput="filterCategoryDropdown(event)">
                         <svg viewBox="0 0 24 24" onclick="toggleCategoryDropdown(event)" style="position: absolute; right: 12px; width: 18px; height: 18px; fill: var(--text-muted); cursor: pointer;"><path d="M7 10l5 5 5-5z"/></svg>
@@ -873,7 +872,7 @@
                     <div id="customCategoryDropdown" class="custom-dropdown-container"></div>
                 </div>
                 <div class="form-group">
-                    <label for="fileInput">აირჩიეთ ფაილი (PDF, სურათი, Excel და ა.შ.)</label>
+                    <label for="fileInput">აირჩიეთ ფაილი</label>
                     <input type="file" id="fileInput" onchange="previewFile(event)">
                 </div>
                 <div class="form-group">
@@ -932,7 +931,7 @@
     <!-- წაშლის დასტურის Modal -->
     <div class="modal" id="deleteConfirmModal">
         <div class="modal-content confirm-modal">
-            <h3 style="font-size: 18px; color: var(--text);">ფაილის წაშლა</h3>
+            <h3 style="font-size: 18px; color: var(--text);">წაშლა</h3>
             <p id="deleteConfirmText" style="color: var(--text-muted); font-size: 14px;">ნამდვილად გსურთ ფაილის წაშლა?</p>
             <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
                 <button class="btn btn-outline" onclick="closeDeleteConfirm()" style="flex: 1; justify-content: center;">გაუქმება</button>
@@ -1019,7 +1018,7 @@
 
     function handleLogout() {
         localStorage.removeItem('isLoggedIn');
-        showToast('წარმატებით გავედით სისტემიდან', 'success');
+        showToast('წარმატებით გახვედით სისტემიდან', 'success');
         showLogin();
     }
 
@@ -1051,7 +1050,7 @@
 
     function getCategoriesList() {
         const categories = [...new Set(filesData.map(f => f.location).filter(Boolean))];
-        if (!categories.includes('ზოგადი')) categories.unshift('ზოგადი');
+        if (!categories.includes('-')) categories.unshift('-');
         return categories;
     }
 
@@ -1140,7 +1139,7 @@
             containerElement.innerHTML = '';
             containerElement.appendChild(canvas);
         } catch(e) {
-            containerElement.innerHTML = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#dc2626">${icons.pdf}</div><span>PDF დოკუმენტი</span></div>`;
+            containerElement.innerHTML = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#dc2626">${icons.pdf}</div><span>PDF</span></div>`;
         }
     }
 
@@ -1167,10 +1166,10 @@
                 html += '</table>';
                 containerElement.innerHTML = `<div class="excel-preview-wrapper">${html}</div>`;
             } else {
-                containerElement.innerHTML = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#059669">${icons.excel}</div><span>Excel ცხრილი</span></div>`;
+                containerElement.innerHTML = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#059669">${icons.excel}</div><span>Excel</span></div>`;
             }
         } catch(e) {
-            containerElement.innerHTML = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#059669">${icons.excel}</div><span>Excel ცხრილი</span></div>`;
+            containerElement.innerHTML = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#059669">${icons.excel}</div><span>Excel</span></div>`;
         }
     }
 
@@ -1232,12 +1231,12 @@
         });
 
         if (filteredFiles.length === 0) {
-            container.innerHTML = `<div class="empty-state">ფაილები ვერ მოიძებნა.</div>`;
+            container.innerHTML = `<div class="empty-state">ფაილები ვერ მოიძებნა</div>`;
             return;
         }
 
         const grouped = filteredFiles.reduce((acc, file) => {
-            const loc = file.location || 'ზოგადი';
+            const loc = file.location || '-';
             if (!acc[loc]) acc[loc] = [];
             acc[loc].push(file);
             return acc;
@@ -1257,21 +1256,21 @@
                 const globalIndex = filesData.indexOf(file);
                 let svgIcon = icons.file;
                 let typeClass = 'default';
-                let typeLabel = 'დოკუმენტი';
+                let typeLabel = 'სხვა დოკუმენტი';
                 const previewId = `preview_box_${globalIndex}`;
 
                 if (file.type.includes('image') || file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
                     svgIcon = icons.image;
                     typeClass = 'image';
-                    typeLabel = 'სურათი';
+                    typeLabel = 'ფოტო';
                 } else if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
                     svgIcon = icons.pdf;
                     typeClass = 'pdf';
-                    typeLabel = 'PDF ფაილი';
+                    typeLabel = 'PDF';
                 } else if (file.type.includes('sheet') || file.type.includes('excel') || (file.name && file.name.match(/\.xls[x]?$|\.csv$/i))) {
                     svgIcon = icons.excel;
                     typeClass = 'excel';
-                    typeLabel = 'Excel ცხრილი';
+                    typeLabel = 'Excel';
                 }
 
                 sectionHTML += `
@@ -1350,7 +1349,7 @@
 
             const newFile = {
                 title: titleInput.value,
-                location: locationInput.value.trim() || 'ზოგადი',
+                location: locationInput.value.trim() || '-',
                 name: file.name,
                 type: fileType,
                 dataUrl: e.target.result
