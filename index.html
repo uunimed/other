@@ -198,13 +198,28 @@
             align-items: center;
         }
 
-        /* ძებნის ინპუტი */
+        /* ძებნის ინპუტი SVG იკონით */
+        .search-box-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box-wrapper svg {
+            position: absolute;
+            left: 12px;
+            width: 18px;
+            height: 18px;
+            fill: var(--text-muted);
+            pointer-events: none;
+        }
+
         .search-input {
-            padding: 10px 16px;
+            padding: 10px 16px 10px 40px;
             border: 1px solid var(--border);
             border-radius: 10px;
             font-size: 14px;
-            width: 250px;
+            width: 280px;
             background: #ffffff;
             transition: all 0.2s;
         }
@@ -409,7 +424,7 @@
             font-size: 10px;
         }
         .preview-mini-table td {
-            border: 1px solid #e2e8f0;
+            border: 1px solid #cbd5e1;
             padding: 3px 4px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -467,7 +482,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Preview ატვირთვის ფანჯარაში (ლიმიტირებული ზომით, რომ არ გაიზარდოს უსასრულოდ) */
+        /* Preview ატვირთვის ფანჯარაში (ლიმიტირებული ზომით) */
         .upload-preview-container {
             margin-top: 10px;
             border: 2px dashed var(--border);
@@ -537,6 +552,22 @@
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* კუსტომიური დასტურის პოპაპი */
+        .modal-content.confirm-modal {
+            background: white;
+            width: 90vw;
+            max-width: 400px;
+            height: auto;
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes modalIn {
@@ -644,7 +675,13 @@
             background: #e2e8f0;
         }
 
-        /* Excel ცხრილის დიზაინი პოპაპში */
+        .toolbar-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--text);
+        }
+
+        /* Excel ცხრილის დიზაინი პოპაპში მკაფიო ბადით */
         .excel-table-container {
             width: 100%;
             height: 100%;
@@ -660,7 +697,7 @@
         }
 
         table.excel-rendered th, table.excel-rendered td {
-            border: 1px solid var(--border);
+            border: 1px solid #cbd5e1 !important; /* მკაფიო ბადის ხაზები */
             padding: 10px 14px;
             text-align: left;
         }
@@ -720,8 +757,11 @@
                 </div>
             </div>
             <div class="header-actions">
-                <!-- ძებნის ველი -->
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 ძებნა სათაურით ან კატეგორიით..." oninput="handleSearch(event)">
+                <!-- ძებნის ველი SVG ლუპით -->
+                <div class="search-box-wrapper">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <input type="text" id="searchInput" class="search-input" placeholder="ძებნა სათაურით ან კატეგორიით..." oninput="handleSearch(event)">
+                </div>
                 <button class="btn" onclick="openUploadModal()">
                     <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                     ფაილის დამატება
@@ -732,11 +772,16 @@
 
         <!-- ფაილების კონტეინერი -->
         <div class="app-body-content">
-            <div id="locationsContainer"></div>
+            <div id="locationsContainer">
+                <div class="spinner-container" style="padding: 60px;">
+                    <div class="spinner"></div>
+                    <span>იტვირთება ფაილები...</span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- ატვირთვის Modal -->
+    <!-- ატვირთვის Modal (მხოლოდ X ღილაკით დახურვადი) -->
     <div class="modal" id="uploadModal">
         <div class="modal-content upload-modal">
             <div class="modal-header">
@@ -745,7 +790,7 @@
                     <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
             </div>
-            <div class="modal-body upload-body">
+            <div class="modal-body upload-body" id="uploadModalBody">
                 <div class="form-group">
                     <label for="fileTitle">ფაილის სათაური</label>
                     <input type="text" id="fileTitle" placeholder="მაგ: პასპორტის ასლი">
@@ -765,16 +810,20 @@
                         <span class="preview-placeholder">ფაილი არ არის არჩეული</span>
                     </div>
                 </div>
-                <button class="btn" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="uploadFile()">ატვირთვა</button>
+                <button class="btn" id="uploadBtn" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="uploadFile()">ატვირთვა</button>
             </div>
         </div>
     </div>
 
-    <!-- ფაილის სანახავი Modal -->
+    <!-- ფაილის სანახავი Modal (მხოლოდ X ღილაკით დახურვადი) -->
     <div class="modal" id="fileModal">
         <div class="modal-content file-view-modal">
             <div class="modal-header">
                 <h3 id="modalTitle">ფაილი</h3>
+                <!-- Excel ძებნის ინპუტი პოპაპის სათაურში (დინამიურად ჩნდება მხოლოდ Excel-ზე) -->
+                <div id="excelSearchContainer" style="display: none; align-items: center;">
+                    <input type="text" id="excelSearchInput" class="search-input" placeholder="ძებნა ცხრილში..." oninput="handleExcelSearch(event)" style="width: 200px; padding: 6px 12px; font-size: 13px;">
+                </div>
                 <button class="close-btn" onclick="closeModal()">
                     <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
@@ -782,21 +831,42 @@
             <div class="modal-body" id="modalBody">
                 <!-- დინამიური კონტენტი -->
             </div>
-            <!-- ქვედა სამართავი ველი -->
+            <!-- ქვედა სამართავი ველი SVG ზომის ღილაკებით და PDF გვერდების ინპუტით -->
             <div class="modal-footer-toolbar">
-                <div class="toolbar-group">
+                <div class="toolbar-group" id="pdfPaginationGroup" style="display: none;">
+                    <span>გვერდი:</span>
+                    <input type="number" id="pdfPageInput" value="1" min="1" style="width: 55px; text-align: center; border: 1px solid var(--border); border-radius: 6px; padding: 4px; font-size: 13px;" onchange="jumpToPdfPage(this.value)">
+                    <span id="pdfTotalPagesSpan">/ 1</span>
+                </div>
+                <div class="toolbar-group" id="generalPageInfoGroup">
                     <span id="pageInfo">დოკუმენტი</span>
                 </div>
                 <div class="toolbar-group">
-                    <button class="toolbar-btn" onclick="zoomFile(-0.1)" title="დაპატარავება">-</button>
+                    <button class="toolbar-btn" onclick="zoomFile(-0.1)" title="დაპატარავება">
+                        <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+                    </button>
                     <span id="zoomLabel" style="width: 45px; text-align: center;">100%</span>
-                    <button class="toolbar-btn" onclick="zoomFile(0.1)" title="გადიდება">+</button>
+                    <button class="toolbar-btn" onclick="zoomFile(0.1)" title="გადიდება">
+                        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    </button>
                 </div>
                 <div class="toolbar-group" style="gap: 10px;">
                     <button class="btn btn-outline" onclick="printCurrentFile()" style="padding: 6px 14px; font-size: 13px;">ბეჭდვა</button>
                     <button class="btn" onclick="downloadCurrentFile()" style="padding: 6px 16px; font-size: 13px;">გადმოწერა</button>
-                    <button class="btn btn-solid-danger" onclick="deleteCurrentFile()" style="padding: 6px 14px; font-size: 13px;">წაშლა</button>
+                    <button class="btn btn-solid-danger" onclick="confirmDeleteFile()" style="padding: 6px 14px; font-size: 13px;">წაშლა</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- კუსტომიური წაშლის დასტურის Modal -->
+    <div class="modal" id="deleteConfirmModal">
+        <div class="modal-content confirm-modal">
+            <h3 style="font-size: 18px; color: var(--text);">ფაილის წაშლა</h3>
+            <p id="deleteConfirmText" style="color: var(--text-muted); font-size: 14px;">ნამდვილად გსურთ ფაილის წაშლა?</p>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                <button class="btn btn-outline" onclick="closeDeleteConfirm()" style="flex: 1; justify-content: center;">გაუქმება</button>
+                <button class="btn btn-solid-danger" onclick="executeDeleteFile()" style="flex: 1; justify-content: center;">წაშლა</button>
             </div>
         </div>
     </div>
@@ -830,6 +900,8 @@
     let currentActiveFile = null;
     let currentZoom = 1;
     let searchQuery = '';
+    let currentPdfDoc = null;
+    let currentPdfBlobUrl = '';
 
     function showToast(message, type = 'error') {
         const container = document.getElementById('toastContainer');
@@ -987,12 +1059,28 @@
         }
     }
 
+    // ფაილების მკაცრი შეზღუდვა (მხოლოდ გახსნადი ფორმატები)
+    function validateFileFormat(file) {
+        const fileName = file.name.toLowerCase();
+        const validExtensions = ['.pdf', '.jpg', '.jpeg', '.png', '.webp', '.xlsx', '.xls', '.csv'];
+        const isValidExt = validExtensions.some(ext => fileName.endsWith(ext));
+        const isValidType = file.type.includes('pdf') || file.type.includes('image') || file.type.includes('sheet') || file.type.includes('excel') || file.type.includes('csv');
+        return isValidExt || isValidType;
+    }
+
     function previewFile(event) {
         const file = event.target.files[0];
         const previewContainer = document.getElementById('uploadPreview');
         
         if (!file) {
             previewContainer.innerHTML = '<span class="preview-placeholder">ფაილი არ არის არჩეული</span>';
+            return;
+        }
+
+        if (!validateFileFormat(file)) {
+            showToast('ამ ტიპის ფაილის ატვირთვა სისტემაში შეუძლებელია!', 'error');
+            event.target.value = '';
+            previewContainer.innerHTML = '<span class="preview-placeholder">ფაილი არ არის მხარდაჭერილი</span>';
             return;
         }
 
@@ -1006,7 +1094,7 @@
         const reader = new FileReader();
         reader.onload = function(e) {
             const dataUrl = e.target.result;
-            if (file.type.includes('image')) {
+            if (file.type.includes('image') || file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
                 previewContainer.innerHTML = `<img src="${dataUrl}" alt="Preview">`;
             } else if (file.type.includes('pdf') || file.name.endsWith('.pdf')) {
                 renderPdfThumbnail(dataUrl, previewContainer);
@@ -1023,7 +1111,6 @@
         const container = document.getElementById('locationsContainer');
         container.innerHTML = '';
 
-        // ფილტრაცია ძებნის მიხედვით
         const filteredFiles = filesData.filter(file => {
             const titleMatch = file.title && file.title.toLowerCase().includes(searchQuery);
             const locMatch = file.location && file.location.toLowerCase().includes(searchQuery);
@@ -1059,7 +1146,7 @@
                 let typeLabel = 'დოკუმენტი';
                 const previewId = `preview_box_${globalIndex}`;
 
-                if (file.type.includes('image')) {
+                if (file.type.includes('image') || file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
                     svgIcon = icons.image;
                     typeClass = 'image';
                     typeLabel = 'სურათი';
@@ -1095,13 +1182,12 @@
             container.innerHTML += sectionHTML;
         }
 
-        // ასინქრონულად ვავსებთ preview-ებს
         filteredFiles.forEach((file) => {
             const globalIndex = filesData.indexOf(file);
             const box = document.getElementById(`preview_box_${globalIndex}`);
             if (!box) return;
 
-            if (file.type.includes('image')) {
+            if (file.type.includes('image') || file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
                 box.innerHTML = `<img src="${file.dataUrl}" alt="${file.title}">`;
             } else if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
                 renderPdfThumbnail(file.dataUrl, box);
@@ -1124,8 +1210,16 @@
         }
 
         const file = fileInput.files[0];
-        const reader = new FileReader();
+        if (!validateFileFormat(file)) {
+            showToast('მხოლოდ გახსნადი ფორმატის ფაილებია დაშვებული!', 'error');
+            return;
+        }
 
+        const uploadBtn = document.getElementById('uploadBtn');
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; border-top-color: white;"></div> მიმდინარეობს ატვირთვა...';
+
+        const reader = new FileReader();
         reader.onload = function(e) {
             let fileType = file.type;
             const fileName = file.name.toLowerCase();
@@ -1134,7 +1228,7 @@
                 fileType = 'application/pdf';
             } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || fileName.endsWith('.csv')) {
                 fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-            } else if (fileName.match(/\.(jpg|jpeg)$/)) {
+            } else if (fileName.match(/\.(jpg|jpeg|webp)$/)) {
                 fileType = 'image/jpeg';
             } else if (fileName.endsWith('.png')) {
                 fileType = 'image/png';
@@ -1149,6 +1243,8 @@
             };
 
             db.ref('files').push(newFile, (error) => {
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = 'ატვირთვა';
                 if (error) {
                     showToast('ატვირთვის შეცდომა ბაზაში', 'error');
                 } else {
@@ -1171,12 +1267,17 @@
         const modalBody = document.getElementById('modalBody');
         const pageInfo = document.getElementById('pageInfo');
         const zoomLabel = document.getElementById('zoomLabel');
+        const excelSearchContainer = document.getElementById('excelSearchContainer');
+        const pdfPaginationGroup = document.getElementById('pdfPaginationGroup');
+        const generalPageInfoGroup = document.getElementById('generalPageInfoGroup');
 
         modalTitle.textContent = file.title;
         zoomLabel.textContent = '100%';
+        excelSearchContainer.style.display = 'none';
+        pdfPaginationGroup.style.display = 'none';
+        generalPageInfoGroup.style.display = 'flex';
         pageInfo.textContent = file.name || 'დოკუმენტი';
 
-        // Loading spinner
         modalBody.innerHTML = `
             <div class="spinner-container">
                 <div class="spinner"></div>
@@ -1190,6 +1291,9 @@
                 const isExcel = file.type.includes('sheet') || file.type.includes('excel') || (file.name && file.name.match(/\.xls[x]?$|\.csv$/i));
 
                 if (isExcel) {
+                    excelSearchContainer.style.display = 'flex';
+                    document.getElementById('excelSearchInput').value = '';
+
                     const base64Data = file.dataUrl.split(',')[1];
                     const workbook = XLSX.read(base64Data, { type: 'base64', codepage: 65001 });
                     const firstSheetName = workbook.SheetNames[0];
@@ -1201,13 +1305,16 @@
                     return;
                 }
 
-                if (file.type.includes('image')) {
+                if (file.type.includes('image') || file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
                     modalBody.innerHTML = `<img src="${file.dataUrl}" alt="${file.title}" id="zoomableContent">`;
                     pageInfo.textContent = `${file.name} (სურათი)`;
                     return;
                 }
 
                 if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
+                    pdfPaginationGroup.style.display = 'flex';
+                    generalPageInfoGroup.style.display = 'none';
+
                     const base64Data = file.dataUrl.split(',')[1];
                     const byteCharacters = atob(base64Data);
                     const byteNumbers = new Array(byteCharacters.length);
@@ -1216,17 +1323,19 @@
                     }
                     const byteArray = new Uint8Array(byteNumbers);
                     
-                    // PDF გვერდების რაოდენობის გამოთვლა PDF.js-ით
                     const loadingTask = pdfjsLib.getDocument({ data: byteArray });
-                    const pdf = await loadingTask.promise;
-                    const totalPages = pdf.numPages;
-                    pageInfo.textContent = `გვერდი 1 / ${totalPages} (სულ ${totalPages} გვერდი)`;
+                    currentPdfDoc = await loadingTask.promise;
+                    const totalPages = currentPdfDoc.numPages;
+
+                    document.getElementById('pdfPageInput').value = 1;
+                    document.getElementById('pdfPageInput').max = totalPages;
+                    document.getElementById('pdfTotalPagesSpan').textContent = `/ ${totalPages}`;
 
                     const blob = new Blob([byteArray], { type: 'application/pdf' });
-                    const blobUrl = URL.createObjectURL(blob);
+                    currentPdfBlobUrl = URL.createObjectURL(blob);
 
                     const iframe = document.createElement('iframe');
-                    iframe.src = blobUrl + '#toolbar=0&navpanes=0&scrollbar=0';
+                    iframe.src = currentPdfBlobUrl + '#page=1&toolbar=0&navpanes=0&scrollbar=0';
                     iframe.id = 'zoomableContent';
                     modalBody.innerHTML = '';
                     modalBody.appendChild(iframe);
@@ -1244,6 +1353,39 @@
                 showToast('ფაილის გახსნის შეცდომა', 'error');
             }
         }, 300);
+    }
+
+    // PDF გვერდის მანუალური შეცვლა
+    function jumpToPdfPage(pageNum) {
+        if (!currentPdfDoc || !currentPdfBlobUrl) return;
+        let page = parseInt(pageNum);
+        if (isNaN(page) || page < 1) page = 1;
+        if (page > currentPdfDoc.numPages) page = currentPdfDoc.numPages;
+        document.getElementById('pdfPageInput').value = page;
+
+        const modalBody = document.getElementById('modalBody');
+        modalBody.innerHTML = '';
+        const iframe = document.createElement('iframe');
+        iframe.src = currentPdfBlobUrl + `#page=${page}&toolbar=0&navpanes=0&scrollbar=0`;
+        iframe.id = 'zoomableContent';
+        modalBody.appendChild(iframe);
+    }
+
+    // Excel ძებნა პოპაპში
+    function handleExcelSearch(event) {
+        const query = event.target.value.toLowerCase().trim();
+        const table = document.querySelector('#zoomableContent');
+        if (!table) return;
+        const rows = table.querySelectorAll('tr');
+        rows.forEach((row, index) => {
+            if (index === 0) return; // სათაურის რიგის დატოვება
+            const text = row.textContent.toLowerCase();
+            if (text.includes(query) || query === '') {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
     }
 
     function zoomFile(delta) {
@@ -1267,10 +1409,28 @@
         showToast('ფაილი გადმოიწერა', 'success');
     }
 
-    // ფაილის სწორი ბეჭდვა (მხოლოდ ფაილის შიგთავსის ბეჭდვა iframe-ით)
+    // ფაილის სწორი ბეჭდვა (მხოლოდ ფაილის/ცხრილის შიგთავსის ბეჭდვა)
     function printCurrentFile() {
         if (!currentActiveFile) return;
         try {
+            const isExcel = currentActiveFile.type.includes('sheet') || currentActiveFile.type.includes('excel') || (currentActiveFile.name && currentActiveFile.name.match(/\.xls[x]?$|\.csv$/i));
+            if (isExcel) {
+                const tableHtml = document.querySelector('#zoomableContent')?.outerHTML || '';
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head><title>${currentActiveFile.title}</title>
+                    <style>table { width: 100%; border-collapse: collapse; font-size: 13px; } th, td { border: 1px solid #000; padding: 8px; text-align: left; }</style>
+                    </head>
+                    <body>${tableHtml}</body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.focus();
+                setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+                return;
+            }
+
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
             iframe.src = currentActiveFile.dataUrl;
@@ -1283,23 +1443,34 @@
                 }, 500);
             };
         } catch(e) {
-            showToast('ბეჭდვის ვერ მოხერხდა', 'error');
+            showToast('ბეჭდვა ვერ მოხერხდა', 'error');
         }
     }
 
-    // ფაილის წაშლის ფუნქცია
-    function deleteCurrentFile() {
+    // კუსტომიური წაშლის პოპაპი
+    function confirmDeleteFile() {
         if (!currentActiveFile) return;
-        if (confirm(`ნამდვილად გსურთ ფაილის („${currentActiveFile.title}“) წაშლა?`)) {
-            db.ref('files/' + currentActiveFile.id).remove((error) => {
-                if (error) {
-                    showToast('წაშლის შეცდომა', 'error');
-                } else {
-                    closeModal();
-                    showToast('ფაილი წარმატებით წაიშალა', 'success');
-                }
-            });
-        }
+        document.getElementById('deleteConfirmText').textContent = `ნამდვილად გსურთ ფაილის („${currentActiveFile.title}“) წაშლა?`;
+        document.getElementById('deleteConfirmModal').style.display = 'flex';
+    }
+
+    function closeDeleteConfirm() {
+        document.getElementById('deleteConfirmModal').style.display = 'none';
+    }
+
+    function executeDeleteFile() {
+        if (!currentActiveFile) return;
+        const fileId = currentActiveFile.id;
+        closeDeleteConfirm();
+
+        db.ref('files/' + fileId).remove((error) => {
+            if (error) {
+                showToast('წაშლის შეცდომა', 'error');
+            } else {
+                closeModal();
+                showToast('ფაილი წარმატებით წაიშალა', 'success');
+            }
+        });
     }
 
     function closeModal() {
@@ -1307,6 +1478,8 @@
         modal.style.display = 'none';
         document.getElementById('modalBody').innerHTML = '';
         currentActiveFile = null;
+        currentPdfDoc = null;
+        currentPdfBlobUrl = '';
     }
 </script>
 
