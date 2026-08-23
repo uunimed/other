@@ -2,171 +2,588 @@
 <html lang="ka">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>გოგოური ლოგიკა 😂</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>პერსონალური ფაილების მენეჯერი</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Excel ფაილების წამკითხველი ბიბლიოთეკა -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        /* საბაზისო პარამეტრები */
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+        }
+
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* შეცვლილი, ახალი ბექგრაუნდი (მხიარული გრადიენტი) */
-            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); 
-            overflow: hidden; /* კრძალავს ეკრანის სქროლვას */
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
             text-align: center;
-            touch-action: none; /* მობილურზე თითის მოძრაობით ეკრანის გაწევას კრძალავს */
+            margin-bottom: 40px;
         }
 
-        h1 {
-            font-size: 2.2rem;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            margin: 0 20px 40px 20px;
+        header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
         }
 
-        .button-wrapper {
-            display: flex;
+        header p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
-            z-index: 10;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full {
+            grid-column: span 2;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text);
+            background: #fff;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus, input[type="file"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            cursor: pointer;
+            background: #f8fafc;
         }
 
         .btn {
-            padding: 15px 40px;
-            font-size: 1.5rem;
-            font-weight: bold;
+            background-color: var(--primary);
+            color: white;
             border: none;
-            border-radius: 50px;
+            padding: 12px 24px;
+            border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            /* ანიმაცია დარბენის დროს */
-            transition: left 0.2s ease-out, top 0.2s ease-out, transform 0.1s; 
+            font-size: 15px;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.2s ease, transform 0.1s ease;
         }
 
-        #noBtn {
-            background-color: #2ecc71;
-            color: white;
+        .btn:hover {
+            background-color: var(--primary-hover);
         }
 
-        #noBtn:active {
-            transform: scale(0.95);
+        .btn:active {
+            transform: scale(0.98);
         }
 
-        #yesBtn {
-            background-color: #ff4757;
-            color: white;
-            position: relative; /* თავიდან ჩვეულებრივად ზის */
+        .location-section {
+            margin-top: 35px;
         }
 
-        #message {
+        .location-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .location-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-count {
+            background: #e0e7ff;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .file-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+
+        .file-icon {
+            font-size: 28px;
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-info {
+            overflow: hidden;
+        }
+
+        .file-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .file-type-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Popup Modal სტილები */
+        .modal {
             display: none;
-            margin-top: 30px;
-            font-size: 2rem;
-            color: #ffffff;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
         }
 
-        @keyframes popIn {
-            0% { opacity: 0; transform: scale(0.5); }
-            100% { opacity: 1; transform: scale(1); }
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 950px;
+            height: 85vh;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalIn 0.25s ease;
         }
 
-        /* მობილურისთვის მორგებული დიზაინი */
-        @media (max-width: 600px) {
-            h1 { font-size: 1.8rem; }
-            .btn { padding: 15px 30px; font-size: 1.3rem; }
-            #message { font-size: 1.6rem; }
-            .button-wrapper {
-                flex-direction: column; /* მობილურზე ღილაკები ერთმანეთის ქვეშ იქნება */
-                gap: 30px;
-            }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            padding: 16px 24px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .close-btn {
+            background: #f1f5f9;
+            border: none;
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #e2e8f0;
+            color: var(--text);
+        }
+
+        .modal-body {
+            flex: 1;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f8fafc;
+            overflow: hidden;
+        }
+
+        .modal-body iframe, .modal-body img {
+            width: 100%;
+            height: 100%;
+            border: none;
+            object-fit: contain;
+        }
+
+        /* Excel ცხრილის დიზაინი პოპაპში */
+        .excel-table-container {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background: white;
+            padding: 20px;
+        }
+
+        table.excel-rendered {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        table.excel-rendered th, table.excel-rendered td {
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        table.excel-rendered th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            color: var(--text);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
 
-    <h1 id="title">გოგოებს მიზეზი როდისმე დაგელევათ?! 🤔</h1>
-    
-    <div class="button-wrapper" id="btnWrapper">
-        <button id="noBtn" class="btn">არა</button>
-        <button id="yesBtn" class="btn">კი</button>
+<div class="container">
+    <header>
+        <h1>პერსონალური ფაილების მენეჯერი</h1>
+        <p>შეინახეთ, დაახარისხეთ და გახსენით ფაილები უსაფრთხოდ ერთ სივრცეში</p>
+    </header>
+
+    <!-- ატვირთვის ფორმა -->
+    <div class="card">
+        <h3>ახალი ფაილის ატვირთვა</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="fileTitle">ფაილის სათაური</label>
+                <input type="text" id="fileTitle" placeholder="მაგ: პასპორტის ასლი">
+            </div>
+            <div class="form-group">
+                <label for="fileLocation">ადგილი / კატეგორია</label>
+                <input type="text" id="fileLocation" placeholder="მაგ: დოკუმენტები, ფოტოები, X">
+            </div>
+            <div class="form-group full">
+                <label for="fileInput">აირჩიეთ ფაილი (PDF, სურათი, Excel და ა.შ.)</label>
+                <input type="file" id="fileInput">
+            </div>
+        </div>
+        <button class="btn" onclick="uploadFile()">ატვირთვა</button>
     </div>
 
-    <div id="message">რა თქმა უნდა არ დაგელევათ! 😂🤷‍♀️</div>
+    <!-- ფაილების კონტეინერი -->
+    <div id="locationsContainer"></div>
+</div>
 
-    <script>
-        const yesBtn = document.getElementById('yesBtn');
-        const noBtn = document.getElementById('noBtn');
-        const message = document.getElementById('message');
-        const title = document.getElementById('title');
-        let isMoving = false;
+<!-- Popup Modal ფანჯარა -->
+<div class="modal" id="fileModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">ფაილი</h3>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- დინამიური კონტენტი -->
+        </div>
+    </div>
+</div>
 
-        function runawayBtn() {
-            // პირველივე გაქცევაზე ღილაკს ვხსნით საერთო განლაგებიდან
-            if (!isMoving) {
-                yesBtn.style.position = 'fixed';
-                isMoving = true;
-            }
+<script>
+    let filesData = JSON.parse(localStorage.getItem('myFiles')) || [];
 
-            // ეკრანის რეალური ზომები
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-            
-            // ღილაკის ზომები
-            const btnWidth = yesBtn.offsetWidth;
-            const btnHeight = yesBtn.offsetHeight;
+    function renderFiles() {
+        const container = document.getElementById('locationsContainer');
+        container.innerHTML = '';
 
-            // უსაფრთხოების ზღვარი (რამდენი პიქსელით იყოს დაშორებული კედლიდან)
-            const margin = 10; 
-            
-            // მაქსიმალური დაშვებული კოორდინატები (რომ ეკრანს არ გაცდეს)
-            const maxX = windowWidth - btnWidth - margin;
-            const maxY = windowHeight - btnHeight - margin;
-
-            // ვირჩევთ შემთხვევით ადგილს უსაფრთხო ზონაში
-            const randomX = Math.max(margin, Math.floor(Math.random() * maxX));
-            const randomY = Math.max(margin, Math.floor(Math.random() * maxY));
-
-            // ვსვამთ ახალ ადგილას
-            yesBtn.style.left = randomX + 'px';
-            yesBtn.style.top = randomY + 'px';
+        if (filesData.length === 0) {
+            container.innerHTML = `<div class="empty-state">ფაილები ჯერ არ არის ატვირთული.</div>`;
+            return;
         }
 
-        // კომპიუტერზე: მაუსის მიტანისას
-        yesBtn.addEventListener('mouseenter', runawayBtn);
-        
-        // მობილურზე: შეხების მცდელობისას
-        // {passive: false} აუცილებელია, რომ preventDefault()-მა იმუშავოს ტელეფონებზე
-        yesBtn.addEventListener('touchstart', function(e) {
-            e.preventDefault(); 
-            runawayBtn();
-        }, { passive: false });
+        const grouped = filesData.reduce((acc, file) => {
+            const loc = file.location || 'ზოგადი';
+            if (!acc[loc]) acc[loc] = [];
+            acc[loc].push(file);
+            return acc;
+        }, {});
 
-        // მაინც თუ როგორმე დააკლიკა (მაგ. Enter-ით), მაინც გარბის
-        yesBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            runawayBtn();
-        });
+        for (const [location, files] of Object.entries(grouped)) {
+            let sectionHTML = `
+                <div class="location-section">
+                    <div class="location-header">
+                        <div class="location-title">📁 ${location}</div>
+                        <span class="file-count">${files.length} ფაილი</span>
+                    </div>
+                    <div class="file-grid">
+            `;
 
-        // "არა"-ზე დაჭერის ფუნქცია
-        noBtn.addEventListener('click', function() {
-            message.style.display = 'block';
-            noBtn.style.display = 'none';
-            yesBtn.style.display = 'none'; // კი ღილაკიც გავაქროთ ბოლოს
-            title.style.display = 'none'; // სათაურიც ქრება, რომ ფოკუსი ტექსტზე იყოს
-        });
-    </script>
+            files.forEach((file) => {
+                const globalIndex = filesData.indexOf(file);
+                let icon = '📄';
+                let typeLabel = 'დოკუმენტი';
+                
+                if (file.type.includes('image')) {
+                    icon = '🖼️';
+                    typeLabel = 'სურათი';
+                } else if (file.type.includes('pdf')) {
+                    icon = '📕';
+                    typeLabel = 'PDF ფაილი';
+                } else if (file.type.includes('sheet') || file.type.includes('excel') || (file.name && file.name.match(/\.xls[x]?$/i))) {
+                    icon = '📊';
+                    typeLabel = 'Excel ცხრილი';
+                }
+
+                sectionHTML += `
+                    <div class="file-card" onclick="openFile(${globalIndex})">
+                        <div class="file-icon">${icon}</div>
+                        <div class="file-info">
+                            <div class="file-title" title="${file.title}">${file.title}</div>
+                            <div class="file-type-label">${typeLabel}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            sectionHTML += `</div></div>`;
+            container.innerHTML += sectionHTML;
+        }
+    }
+
+    function uploadFile() {
+        const titleInput = document.getElementById('fileTitle');
+        const locationInput = document.getElementById('fileLocation');
+        const fileInput = document.getElementById('fileInput');
+
+        if (!titleInput.value || !fileInput.files[0]) {
+            alert('გთხოვთ მიუთითოთ სათაური და აირჩიოთ ფაილი!');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            let fileType = file.type;
+            const fileName = file.name.toLowerCase();
+
+            // ფაილის ტიპის ზუსტი იდენტიფიკაცია გაფართოების მიხედვით
+            if (fileName.endsWith('.pdf')) {
+                fileType = 'application/pdf';
+            } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            } else if (fileName.match(/\.(jpg|jpeg)$/)) {
+                fileType = 'image/jpeg';
+            } else if (fileName.endsWith('.png')) {
+                fileType = 'image/png';
+            }
+
+            const newFile = {
+                title: titleInput.value,
+                location: locationInput.value.trim() || 'ზოგადი',
+                name: file.name,
+                type: fileType,
+                dataUrl: e.target.result
+            };
+
+            filesData.push(newFile);
+            localStorage.setItem('myFiles', JSON.stringify(filesData));
+            
+            titleInput.value = '';
+            locationInput.value = '';
+            fileInput.value = '';
+
+            renderFiles();
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    function openFile(index) {
+        const file = filesData[index];
+        const modal = document.getElementById('fileModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+
+        modalTitle.textContent = file.title;
+        modalBody.innerHTML = '<div style="color: var(--text-muted); font-size: 14px;">იტვირთება...</div>';
+        modal.style.display = 'flex';
+
+        try {
+            const isExcel = file.type.includes('sheet') || file.type.includes('excel') || (file.name && file.name.match(/\.xls[x]?$/i));
+
+            if (isExcel) {
+                // Excel ფაილის დამუშავება ბიბლიოთეკით
+                const base64Data = file.dataUrl.split(',')[1];
+                const workbook = XLSX.read(base64Data, { type: 'base64' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const htmlTable = XLSX.utils.sheet_to_html(worksheet, { header: '<table class="excel-rendered">' });
+
+                modalBody.innerHTML = `<div class="excel-table-container">${htmlTable}</div>`;
+                return;
+            }
+
+            if (file.type.includes('image')) {
+                const img = document.createElement('img');
+                img.src = file.dataUrl;
+                modalBody.innerHTML = '';
+                modalBody.appendChild(img);
+                return;
+            }
+
+            if (file.type.includes('pdf')) {
+                // PDF ფაილის გარდაქმნა სწორ Blob-ად
+                const base64Data = file.dataUrl.split(',')[1];
+                const byteCharacters = atob(base64Data);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                const blobUrl = URL.createObjectURL(blob);
+
+                const iframe = document.createElement('iframe');
+                iframe.src = blobUrl;
+                modalBody.innerHTML = '';
+                modalBody.appendChild(iframe);
+                return;
+            }
+
+            // ნებისმიერი სხვა ფაილისთვის
+            const iframe = document.createElement('iframe');
+            iframe.src = file.dataUrl;
+            modalBody.innerHTML = '';
+            modalBody.appendChild(iframe);
+
+        } catch (error) {
+            modalBody.innerHTML = '<div style="color: #ef4444;">ფაილის გახსნა ვერ მოხერხდა.</div>';
+        }
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('fileModal');
+        modal.style.display = 'none';
+        document.getElementById('modalBody').innerHTML = '';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('fileModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+    renderFiles();
+</script>
 
 </body>
 </html>
