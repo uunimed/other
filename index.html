@@ -9,7 +9,8 @@
     <!-- SheetJS Excel წამკითხველი -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-    <!-- PDF.js რენდერისთვის -->
+    <!-- PDF.js და Text Layer სტილები -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -1506,11 +1507,15 @@
 
         for (let i = 1; i <= currentPdfDoc.numPages; i++) {
             const pageWrapper = document.createElement('div');
-            pageWrapper.style.cssText = 'margin-bottom: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; display: flex; justify-content: center;';
+            pageWrapper.style.cssText = 'position: relative; margin-bottom: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; display: flex; justify-content: center;';
             
             const canvas = document.createElement('canvas');
-            canvas.className = 'zoomable-pdf-page';
             pageWrapper.appendChild(canvas);
+
+            const textLayerDiv = document.createElement('div');
+            textLayerDiv.className = 'textLayer';
+            pageWrapper.appendChild(textLayerDiv);
+
             modalBody.appendChild(pageWrapper);
 
             try {
@@ -1521,8 +1526,20 @@
 
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
+                pageWrapper.style.width = `${viewport.width}px`;
+                pageWrapper.style.height = `${viewport.height}px`;
 
                 await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                // ტექსტური ფენის რენდერი მონიშვნისთვის
+                const textContent = await page.getTextContent();
+                await pdfjsLib.renderTextLayer({
+                    textContentSource: textContent,
+                    container: textLayerDiv,
+                    viewport: viewport,
+                    textDivs: []
+                }).promise;
+
             } catch (err) {
                 console.error(`Error rendering page ${i}`, err);
             }
