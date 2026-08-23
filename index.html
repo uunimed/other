@@ -9,7 +9,7 @@
     <!-- SheetJS Excel წამკითხველი -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
-    <!-- PDF.js PDF პირველი გვერდის რენდერისთვის -->
+    <!-- PDF.js PDF გვერდების დასათვლელად -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -46,13 +46,12 @@
             min-height: 100vh;
         }
 
-        /* სრული სიგანის კონტეინერი კიდეების გარეშე */
         .container {
             width: 100%;
             padding: 0;
         }
 
-        /* ნეიტრალური ავტორიზაციის გვერდი */
+        /* ავტორიზაციის გვერდი */
         .login-wrapper {
             display: flex;
             justify-content: center;
@@ -158,7 +157,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Edge-to-Edge სათაური და ხაზი */
+        /* სათაური და კიდიდან კიდემდე ხაზი (თეთრი ფონის გარეშე) */
         header {
             width: 100%;
             display: flex;
@@ -167,7 +166,7 @@
             padding: 16px 30px;
             border-bottom: 2px solid var(--border);
             margin-bottom: 30px;
-            background: #ffffff;
+            background: transparent;
         }
 
         .header-title {
@@ -197,6 +196,22 @@
             display: flex;
             gap: 14px;
             align-items: center;
+        }
+
+        /* ძებნის ინპუტი */
+        .search-input {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            width: 250px;
+            background: #ffffff;
+            transition: all 0.2s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
 
         .app-body-content {
@@ -237,16 +252,24 @@
             transform: none;
         }
 
-        .btn-logout {
+        .btn-danger {
             background-color: #fee2e2;
             color: #dc2626;
             border: 1px solid #fca5a5;
             box-shadow: none;
         }
-
-        .btn-logout:hover {
+        .btn-danger:hover {
             background-color: #fecaca;
             color: #b91c1c;
+        }
+
+        .btn-solid-danger {
+            background-color: #ef4444;
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+        .btn-solid-danger:hover {
+            background-color: #dc2626;
         }
 
         /* ფორმის ელემენტები */
@@ -444,15 +467,16 @@
             letter-spacing: 0.5px;
         }
 
-        /* Preview ატვირთვის ფანჯარაში */
+        /* Preview ატვირთვის ფანჯარაში (ლიმიტირებული ზომით, რომ არ გაიზარდოს უსასრულოდ) */
         .upload-preview-container {
             margin-top: 10px;
             border: 2px dashed var(--border);
             border-radius: 12px;
-            padding: 16px;
+            padding: 12px;
             text-align: center;
             background: #f8fafc;
-            min-height: 140px;
+            max-height: 130px;
+            min-height: 90px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -461,7 +485,7 @@
 
         .upload-preview-container img {
             max-width: 100%;
-            max-height: 160px;
+            max-height: 110px;
             border-radius: 8px;
             object-fit: contain;
         }
@@ -487,7 +511,6 @@
             padding: 20px;
         }
 
-        /* ფაილის გახსნის პოპაპი: კიდეებიდან ზუსტად 1 სმ (calc 100vw - 2cm) */
         .modal-content.file-view-modal {
             width: calc(100vw - 2cm);
             height: calc(100vh - 2cm);
@@ -689,19 +712,21 @@
     <div id="appView" class="container hidden">
         <header>
             <div class="header-title">
-                <!-- SVG იკონა სათაურის წინ -->
-                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                <!-- ფაილის მსგავსი SVG იკონა -->
+                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 <div>
                     <h1>პერსონალური ფაილების მენეჯერი</h1>
                     <p>შეინახეთ, დაახარისხეთ და გახსენით ფაილები უსაფრთხოდ</p>
                 </div>
             </div>
             <div class="header-actions">
+                <!-- ძებნის ველი -->
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 ძებნა სათაურით ან კატეგორიით..." oninput="handleSearch(event)">
                 <button class="btn" onclick="openUploadModal()">
                     <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                     ფაილის დამატება
                 </button>
-                <button class="btn btn-logout" onclick="handleLogout()">გასვლა</button>
+                <button class="btn btn-danger" onclick="handleLogout()">გასვლა</button>
             </div>
         </header>
 
@@ -727,8 +752,7 @@
                 </div>
                 <div class="form-group">
                     <label for="fileLocation">ადგილი / კატეგორია</label>
-                    <!-- Datalist კატეგორიების ავტომატური მეხსიერებისთვის -->
-                    <input type="text" id="fileLocation" list="categoryOptions" placeholder="აირჩიეთ ან აკრიფეთ ახალი">
+                    <input type="text" id="fileLocation" list="categoryOptions" placeholder="აირჩიეთ არსებული ან აკრიფეთ ახალი">
                     <datalist id="categoryOptions"></datalist>
                 </div>
                 <div class="form-group">
@@ -746,7 +770,7 @@
         </div>
     </div>
 
-    <!-- ფაილის სანახავი Modal (გადიდებული ზომით და ქვედა პანელით) -->
+    <!-- ფაილის სანახავი Modal -->
     <div class="modal" id="fileModal">
         <div class="modal-content file-view-modal">
             <div class="modal-header">
@@ -771,13 +795,14 @@
                 <div class="toolbar-group" style="gap: 10px;">
                     <button class="btn btn-outline" onclick="printCurrentFile()" style="padding: 6px 14px; font-size: 13px;">ბეჭდვა</button>
                     <button class="btn" onclick="downloadCurrentFile()" style="padding: 6px 16px; font-size: 13px;">გადმოწერა</button>
+                    <button class="btn btn-solid-danger" onclick="deleteCurrentFile()" style="padding: 6px 14px; font-size: 13px;">წაშლა</button>
                 </div>
             </div>
         </div>
     </div>
 
 <script>
-    // Firebase კონფიგურაცია და ინიციალიზაცია
+    // Firebase კონფიგურაცია
     const firebaseConfig = {
         apiKey: "AIzaSyATvDjEFcDxjOiT3dEs9u5fmGQT5eIC7ao",
         authDomain: "xelmowera-a9071.firebaseapp.com",
@@ -804,6 +829,7 @@
     let filesData = [];
     let currentActiveFile = null;
     let currentZoom = 1;
+    let searchQuery = '';
 
     function showToast(message, type = 'error') {
         const container = document.getElementById('toastContainer');
@@ -857,14 +883,14 @@
         initFirebaseSync();
     }
 
-    // Firebase-დან მონაცემების რეალურ დროში მიღება
     function initFirebaseSync() {
         db.ref('files').on('value', (snapshot) => {
             const data = snapshot.val();
+            filesData = [];
             if (data) {
-                filesData = Object.values(data);
-            } else {
-                filesData = [];
+                Object.keys(data).forEach(key => {
+                    filesData.push({ id: key, ...data[key] });
+                });
             }
             renderFiles();
             updateCategoryDatalist();
@@ -884,6 +910,11 @@
         });
     }
 
+    function handleSearch(event) {
+        searchQuery = event.target.value.toLowerCase().trim();
+        renderFiles();
+    }
+
     function openUploadModal() {
         document.getElementById('uploadModal').style.display = 'flex';
         updateCategoryDatalist();
@@ -897,7 +928,7 @@
         document.getElementById('uploadPreview').innerHTML = '<span class="preview-placeholder">ფაილი არ არის არჩეული</span>';
     }
 
-    // PDF პირველი გვერდის კანვასზე რენდერი
+    // PDF Preview რენდერი
     async function renderPdfThumbnail(dataUrl, containerElement) {
         try {
             const base64Data = dataUrl.split(',')[1];
@@ -913,7 +944,7 @@
             
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
-            const viewport = page.getViewport({ scale: 0.6 });
+            const viewport = page.getViewport({ scale: 0.5 });
             canvas.height = viewport.height;
             canvas.width = viewport.width;
             
@@ -925,11 +956,11 @@
         }
     }
 
-    // Excel მინი ტაბლის რენდერი Preview-სთვის
+    // Excel Preview რენდერი (ქართული შრიფტების კოდფეიჯით)
     function renderExcelThumbnail(dataUrl, containerElement) {
         try {
             const base64Data = dataUrl.split(',')[1];
-            const workbook = XLSX.read(base64Data, { type: 'base64' });
+            const workbook = XLSX.read(base64Data, { type: 'base64', codepage: 65001 });
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
             const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
@@ -965,19 +996,24 @@
             return;
         }
 
+        previewContainer.innerHTML = `
+            <div class="spinner-container" style="min-height: 70px;">
+                <div class="spinner" style="width: 28px; height: 28px; border-width: 3px;"></div>
+                <span style="font-size: 11px;">იტვირთება Preview...</span>
+            </div>
+        `;
+
         const reader = new FileReader();
         reader.onload = function(e) {
             const dataUrl = e.target.result;
             if (file.type.includes('image')) {
                 previewContainer.innerHTML = `<img src="${dataUrl}" alt="Preview">`;
             } else if (file.type.includes('pdf') || file.name.endsWith('.pdf')) {
-                previewContainer.innerHTML = `<div class="file-card-preview-placeholder">იტვირთება PDF Preview...</div>`;
                 renderPdfThumbnail(dataUrl, previewContainer);
             } else if (file.type.includes('sheet') || file.type.includes('excel') || file.name.match(/\.xls[x]?$|\.csv$/i)) {
-                previewContainer.innerHTML = `<div class="file-card-preview-placeholder">იტვირთება Excel Preview...</div>`;
                 renderExcelThumbnail(dataUrl, previewContainer);
             } else {
-                previewContainer.innerHTML = `<div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);font-weight:500;"><div style="width:28px;height:28px;fill:#4b5563">${icons.file}</div><span>${file.name}</span></div>`;
+                previewContainer.innerHTML = `<div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);font-weight:500;"><div style="width:24px;height:24px;fill:#4b5563">${icons.file}</div><span>${file.name}</span></div>`;
             }
         }
         reader.readAsDataURL(file);
@@ -987,12 +1023,19 @@
         const container = document.getElementById('locationsContainer');
         container.innerHTML = '';
 
-        if (filesData.length === 0) {
-            container.innerHTML = `<div class="empty-state">ფაილები ჯერ არ არის ატვირთული. გამოიყენეთ „ფაილის დამატება“ ღილაკი.</div>`;
+        // ფილტრაცია ძებნის მიხედვით
+        const filteredFiles = filesData.filter(file => {
+            const titleMatch = file.title && file.title.toLowerCase().includes(searchQuery);
+            const locMatch = file.location && file.location.toLowerCase().includes(searchQuery);
+            return titleMatch || locMatch;
+        });
+
+        if (filteredFiles.length === 0) {
+            container.innerHTML = `<div class="empty-state">ფაილები ვერ მოიძებნა.</div>`;
             return;
         }
 
-        const grouped = filesData.reduce((acc, file) => {
+        const grouped = filteredFiles.reduce((acc, file) => {
             const loc = file.location || 'ზოგადი';
             if (!acc[loc]) acc[loc] = [];
             acc[loc].push(file);
@@ -1014,7 +1057,6 @@
                 let svgIcon = icons.file;
                 let typeClass = 'default';
                 let typeLabel = 'დოკუმენტი';
-                
                 const previewId = `preview_box_${globalIndex}`;
 
                 if (file.type.includes('image')) {
@@ -1034,7 +1076,9 @@
                 sectionHTML += `
                     <div class="file-card" onclick="openFile(${globalIndex})">
                         <div class="file-card-preview" id="${previewId}">
-                            <div class="file-card-preview-placeholder">იტვირთება...</div>
+                            <div class="spinner-container" style="min-height: 80px;">
+                                <div class="spinner" style="width: 24px; height: 24px; border-width: 2px;"></div>
+                            </div>
                         </div>
                         <div class="file-card-footer">
                             <div class="file-icon-box ${typeClass}">${svgIcon}</div>
@@ -1052,8 +1096,9 @@
         }
 
         // ასინქრონულად ვავსებთ preview-ებს
-        filesData.forEach((file, index) => {
-            const box = document.getElementById(`preview_box_${index}`);
+        filteredFiles.forEach((file) => {
+            const globalIndex = filesData.indexOf(file);
+            const box = document.getElementById(`preview_box_${globalIndex}`);
             if (!box) return;
 
             if (file.type.includes('image')) {
@@ -1103,7 +1148,6 @@
                 dataUrl: e.target.result
             };
 
-            // მონაცემის გაგზავნა Firebase Realtime Database-ში (გლობალური პუბლიკაცია)
             db.ref('files').push(newFile, (error) => {
                 if (error) {
                     showToast('ატვირთვის შეცდომა ბაზაში', 'error');
@@ -1117,7 +1161,7 @@
         reader.readAsDataURL(file);
     }
 
-    function openFile(index) {
+    async function openFile(index) {
         const file = filesData[index];
         currentActiveFile = file;
         currentZoom = 1;
@@ -1136,28 +1180,30 @@
         modalBody.innerHTML = `
             <div class="spinner-container">
                 <div class="spinner"></div>
-                <span>იტვირთება...</span>
+                <span>იტვირთება დოკუმენტი...</span>
             </div>
         `;
         modal.style.display = 'flex';
 
-        setTimeout(() => {
+        setTimeout(async () => {
             try {
                 const isExcel = file.type.includes('sheet') || file.type.includes('excel') || (file.name && file.name.match(/\.xls[x]?$|\.csv$/i));
 
                 if (isExcel) {
                     const base64Data = file.dataUrl.split(',')[1];
-                    const workbook = XLSX.read(base64Data, { type: 'base64' });
+                    const workbook = XLSX.read(base64Data, { type: 'base64', codepage: 65001 });
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     const htmlTable = XLSX.utils.sheet_to_html(worksheet, { header: '<table class="excel-rendered" id="zoomableContent">' });
 
                     modalBody.innerHTML = `<div class="excel-table-container">${htmlTable}</div>`;
+                    pageInfo.textContent = `${file.name} (Excel ცხრილი)`;
                     return;
                 }
 
                 if (file.type.includes('image')) {
                     modalBody.innerHTML = `<img src="${file.dataUrl}" alt="${file.title}" id="zoomableContent">`;
+                    pageInfo.textContent = `${file.name} (სურათი)`;
                     return;
                 }
 
@@ -1169,6 +1215,13 @@
                         byteNumbers[i] = byteCharacters.charCodeAt(i);
                     }
                     const byteArray = new Uint8Array(byteNumbers);
+                    
+                    // PDF გვერდების რაოდენობის გამოთვლა PDF.js-ით
+                    const loadingTask = pdfjsLib.getDocument({ data: byteArray });
+                    const pdf = await loadingTask.promise;
+                    const totalPages = pdf.numPages;
+                    pageInfo.textContent = `გვერდი 1 / ${totalPages} (სულ ${totalPages} გვერდი)`;
+
                     const blob = new Blob([byteArray], { type: 'application/pdf' });
                     const blobUrl = URL.createObjectURL(blob);
 
@@ -1214,8 +1267,39 @@
         showToast('ფაილი გადმოიწერა', 'success');
     }
 
+    // ფაილის სწორი ბეჭდვა (მხოლოდ ფაილის შიგთავსის ბეჭდვა iframe-ით)
     function printCurrentFile() {
-        window.print();
+        if (!currentActiveFile) return;
+        try {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = currentActiveFile.dataUrl;
+            document.body.appendChild(iframe);
+            iframe.onload = function() {
+                setTimeout(() => {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                    document.body.removeChild(iframe);
+                }, 500);
+            };
+        } catch(e) {
+            showToast('ბეჭდვის ვერ მოხერხდა', 'error');
+        }
+    }
+
+    // ფაილის წაშლის ფუნქცია
+    function deleteCurrentFile() {
+        if (!currentActiveFile) return;
+        if (confirm(`ნამდვილად გსურთ ფაილის („${currentActiveFile.title}“) წაშლა?`)) {
+            db.ref('files/' + currentActiveFile.id).remove((error) => {
+                if (error) {
+                    showToast('წაშლის შეცდომა', 'error');
+                } else {
+                    closeModal();
+                    showToast('ფაილი წარმატებით წაიშალა', 'success');
+                }
+            });
+        }
     }
 
     function closeModal() {
@@ -1223,14 +1307,6 @@
         modal.style.display = 'none';
         document.getElementById('modalBody').innerHTML = '';
         currentActiveFile = null;
-    }
-
-    // პოპაპი არ იხურება გარეთ დაკლიკებით (მხოლოდ X ღილაკით)
-    window.onclick = function(event) {
-        const uploadModal = document.getElementById('uploadModal');
-        if (event.target === uploadModal) {
-            closeUploadModal();
-        }
     }
 </script>
 
