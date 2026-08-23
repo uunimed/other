@@ -172,6 +172,12 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: opacity 0.2s;
+        }
+        .header-title:hover {
+            opacity: 0.85;
         }
 
         .header-title svg {
@@ -296,7 +302,7 @@
             color: var(--text);
         }
 
-        input[type="text"], input[type="password"], input[type="file"] {
+        input[type="text"], input[type="password"], input[type="file"], select {
             width: 100%;
             padding: 12px 16px;
             border: 1px solid var(--border);
@@ -308,7 +314,7 @@
             transition: all 0.2s ease;
         }
 
-        input:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
@@ -417,7 +423,7 @@
             font-size: 10px;
         }
         .preview-mini-table td {
-            border: 1px solid #cbd5e1;
+            border: 1px solid #cbd5e1 !important;
             padding: 3px 4px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -680,7 +686,7 @@
 
         table.excel-rendered {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: collapse !important;
             font-size: 13px;
         }
 
@@ -691,7 +697,7 @@
         }
 
         table.excel-rendered th {
-            background-color: #f1f5f9;
+            background-color: #f1f5f9 !important;
             font-weight: 600;
             color: var(--text);
             position: sticky;
@@ -735,11 +741,11 @@
     <!-- მთავარი აპლიკაცია -->
     <div id="appView" class="container hidden">
         <header>
-            <div class="header-title">
+            <div class="header-title" onclick="refreshData()" title="მონაცემების განახლება">
                 <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 <div>
                     <h1>პერსონალური ფაილების მენეჯერი</h1>
-                    <p>შეინახეთ, დაახარისხეთ და გახსენით ფაილები უსაფრთხოდ</p>
+                    <p>შეინახეთ, დაახარისხეთ და გახსენით ფაილები უსაფრთხოდ (დააკლიკეთ განახლებისთვის)</p>
                 </div>
             </div>
             <div class="header-actions">
@@ -781,8 +787,9 @@
                 </div>
                 <div class="form-group">
                     <label for="fileLocation">ადგილი / კატეგორია</label>
-                    <input type="text" id="fileLocation" list="categoryOptions" placeholder="აირჩიეთ არსებული ან აკრიფეთ ახალი" autocomplete="off">
-                    <datalist id="categoryOptions"></datalist>
+                    <select id="fileLocation">
+                        <option value="ზოგადი">ზოგადი</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="fileInput">აირჩიეთ ფაილი (PDF, სურათი, Excel და ა.შ.)</label>
@@ -903,6 +910,11 @@
         }
     });
 
+    function refreshData() {
+        showToast('მონაცემები განახლდა', 'success');
+        initFirebaseSync();
+    }
+
     function handleLogin() {
         const user = document.getElementById('usernameInput').value.trim();
         const pass = document.getElementById('passwordInput').value.trim();
@@ -943,21 +955,24 @@
                 });
             }
             renderFiles();
-            updateCategoryDatalist();
+            updateCategoryDropdown();
         }, (error) => {
             showToast('მონაცემთა ბაზასთან კავშირის შეცდომა', 'error');
         });
     }
 
-    function updateCategoryDatalist() {
-        const datalist = document.getElementById('categoryOptions');
-        if (!datalist) return;
-        datalist.innerHTML = '';
+    function updateCategoryDropdown() {
+        const select = document.getElementById('fileLocation');
+        if (!select) return;
         const categories = [...new Set(filesData.map(f => f.location).filter(Boolean))];
+        if (!categories.includes('ზოგადი')) categories.unshift('ზოგადი');
+
+        select.innerHTML = '';
         categories.forEach(cat => {
             const option = document.createElement('option');
             option.value = cat;
-            datalist.appendChild(option);
+            option.textContent = cat;
+            select.appendChild(option);
         });
     }
 
@@ -968,13 +983,12 @@
 
     function openUploadModal() {
         document.getElementById('uploadModal').style.display = 'flex';
-        updateCategoryDatalist();
+        updateCategoryDropdown();
     }
 
     function closeUploadModal() {
         document.getElementById('uploadModal').style.display = 'none';
         document.getElementById('fileTitle').value = '';
-        document.getElementById('fileLocation').value = '';
         document.getElementById('fileInput').value = '';
         document.getElementById('uploadPreview').innerHTML = '<span class="preview-placeholder">ფაილი არ არის არჩეული</span>';
     }
@@ -1282,8 +1296,18 @@
                 }
 
                 if (file.type.includes('image') || file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
-                    modalBody.innerHTML = `<img src="${file.dataUrl}" alt="${file.title}" id="zoomableContent">`;
+                    modalBody.innerHTML = `<img src="${file.dataUrl}" alt="${file.title}" id="zoomableContent" style="cursor: zoom-in;">`;
                     pageInfo.textContent = `${file.name} (სურათი)`;
+
+                    const imgElem = document.getElementById('zoomableContent');
+                    imgElem.addEventListener('wheel', (e) => {
+                        e.preventDefault();
+                        if (e.deltaY < 0) {
+                            zoomFile(0.1);
+                        } else {
+                            zoomFile(-0.1);
+                        }
+                    }, { passive: false });
                     return;
                 }
 
@@ -1372,10 +1396,10 @@
         if (!table) return;
         const rows = table.querySelectorAll('tr');
         rows.forEach((row, index) => {
-            if (index === 0) return; 
+            if (index === 0) return;
             const text = row.textContent.toLowerCase();
             if (query === '' || text.includes(query)) {
-                row.style.display = 'table-row';
+                row.style.display = '';
             } else {
                 row.style.display = 'none';
             }
@@ -1415,34 +1439,86 @@
             const isExcel = currentActiveFile.type.includes('sheet') || currentActiveFile.type.includes('excel') || (currentActiveFile.name && currentActiveFile.name.match(/\.xls[x]?$|\.csv$/i));
             if (isExcel) {
                 const tableHtml = document.querySelector('#zoomableContent')?.outerHTML || '';
-                let printFrame = document.getElementById('printFrame');
-                if (!printFrame) {
-                    printFrame = document.createElement('iframe');
-                    printFrame.id = 'printFrame';
-                    printFrame.style.display = 'none';
-                    document.body.appendChild(printFrame);
-                }
-                const doc = printFrame.contentWindow.document;
-                doc.open();
-                doc.write(`
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
                     <html>
                     <head>
                         <title>${currentActiveFile.title}</title>
                         <style>
-                            body { font-family: 'Inter', sans-serif; padding: 20px; color: #0f172a; }
-                            table { width: 100%; border-collapse: collapse; font-size: 13px; }
-                            th, td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }
-                            th { background-color: #f1f5f9; }
+                            body { font-family: 'Inter', sans-serif; padding: 20px; color: #000; }
+                            table { width: 100%; border-collapse: collapse !important; font-size: 13px; }
+                            th, td { border: 1px solid #000 !important; padding: 8px 12px; text-align: left; }
+                            th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; }
                         </style>
                     </head>
-                    <body>${tableHtml}</body>
+                    <body>
+                        <h2>${currentActiveFile.title}</h2>
+                        ${tableHtml}
+                    </body>
                     </html>
                 `);
-                doc.close();
-                printFrame.contentWindow.focus();
+                printWindow.document.close();
+                printWindow.focus();
                 setTimeout(() => {
-                    printFrame.contentWindow.print();
+                    printWindow.print();
+                    printWindow.close();
                 }, 500);
+                return;
+            }
+
+            const isImage = currentActiveFile.type.includes('image') || (currentActiveFile.name && currentActiveFile.name.match(/\.(jpg|jpeg|png|webp)$/i));
+            if (isImage) {
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>${currentActiveFile.title}</title>
+                        <style>
+                            body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #fff; }
+                            img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                        </style>
+                    </head>
+                    <body>
+                        <img src="${currentActiveFile.dataUrl}">
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.focus();
+                setTimeout(() => {
+                    printWindow.print();
+                    printWindow.close();
+                }, 500);
+                return;
+            }
+
+            const isPdf = currentActiveFile.type.includes('pdf') || (currentActiveFile.name && currentActiveFile.name.endsWith('.pdf'));
+            if (isPdf) {
+                const base64Data = currentActiveFile.dataUrl.split(',')[1];
+                const byteCharacters = atob(base64Data);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                const blobUrl = URL.createObjectURL(blob);
+
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = blobUrl;
+                document.body.appendChild(iframe);
+                iframe.onload = function() {
+                    setTimeout(() => {
+                        try {
+                            iframe.contentWindow.focus();
+                            iframe.contentWindow.print();
+                        } catch(e) {
+                            window.open(blobUrl, '_blank');
+                        }
+                        setTimeout(() => document.body.removeChild(iframe), 2000);
+                    }, 500);
+                };
                 return;
             }
 
