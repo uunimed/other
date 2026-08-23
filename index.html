@@ -902,11 +902,6 @@
             <div class="modal-body" id="modalBody">
             </div>
             <div class="modal-footer-toolbar">
-                <div class="toolbar-group" id="pdfPaginationGroup" style="display: none;">
-                    <span>გვერდი:</span>
-                    <input type="number" id="pdfPageInput" value="1" min="1" style="width: 55px; text-align: center; border: 1px solid var(--border); border-radius: 6px; padding: 4px; font-size: 13px; background: #fff;" onchange="jumpToPdfPage(this.value)">
-                    <span id="pdfTotalPagesSpan">/ 1</span>
-                </div>
                 <div class="toolbar-group" id="generalPageInfoGroup">
                     <span id="pageInfo">დოკუმენტი</span>
                 </div>
@@ -1397,13 +1392,11 @@
         const pageInfo = document.getElementById('pageInfo');
         const zoomLabel = document.getElementById('zoomLabel');
         const excelSearchContainer = document.getElementById('excelSearchContainer');
-        const pdfPaginationGroup = document.getElementById('pdfPaginationGroup');
         const generalPageInfoGroup = document.getElementById('generalPageInfoGroup');
 
         modalTitle.textContent = file.title;
         zoomLabel.textContent = '100%';
         excelSearchContainer.style.display = 'none';
-        pdfPaginationGroup.style.display = 'none';
         generalPageInfoGroup.style.display = 'flex';
         pageInfo.textContent = file.name || 'დოკუმენტი';
 
@@ -1474,9 +1467,6 @@
                 }
 
                 if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
-                    pdfPaginationGroup.style.display = 'flex';
-                    generalPageInfoGroup.style.display = 'none';
-
                     const base64Data = file.dataUrl.split(',')[1];
                     const byteCharacters = atob(base64Data);
                     const byteNumbers = new Array(byteCharacters.length);
@@ -1487,13 +1477,9 @@
 
                     const loadingTask = pdfjsLib.getDocument({ data: byteArray });
                     currentPdfDoc = await loadingTask.promise;
-                    const totalPages = currentPdfDoc.numPages;
-
-                    document.getElementById('pdfPageInput').value = 1;
-                    document.getElementById('pdfPageInput').max = totalPages;
-                    document.getElementById('pdfTotalPagesSpan').textContent = `/ ${totalPages}`;
-
-                    await renderCurrentPdfPage();
+                    
+                    pageInfo.textContent = `${file.name} (${currentPdfDoc.numPages} გვერდი)`;
+                    await renderAllPdfPages();
                     return;
                 }
 
@@ -1513,39 +1499,34 @@
         }, 300);
     }
 
-    async function renderCurrentPdfPage() {
+    async function renderAllPdfPages() {
         if (!currentPdfDoc) return;
         const modalBody = document.getElementById('modalBody');
-        const pageNum = parseInt(document.getElementById('pdfPageInput').value) || 1;
+        modalBody.innerHTML = '';
 
-        try {
-            const page = await currentPdfDoc.getPage(pageNum);
+        for (let i = 1; i <= currentPdfDoc.numPages; i++) {
+            const pageWrapper = document.createElement('div');
+            pageWrapper.style.cssText = 'margin-bottom: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; display: flex; justify-content: center;';
+            
             const canvas = document.createElement('canvas');
-            canvas.id = 'zoomableContent';
-            const context = canvas.getContext('2d');
+            canvas.className = 'zoomable-pdf-page';
+            pageWrapper.appendChild(canvas);
+            modalBody.appendChild(pageWrapper);
 
-            const baseScale = 1.3;
-            const viewport = page.getViewport({ scale: baseScale * currentZoom });
+            try {
+                const page = await currentPdfDoc.getPage(i);
+                const context = canvas.getContext('2d');
+                const baseScale = 1.3;
+                const viewport = page.getViewport({ scale: baseScale * currentZoom });
 
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
 
-            await page.render({ canvasContext: context, viewport: viewport }).promise;
-
-            modalBody.innerHTML = '';
-            modalBody.appendChild(canvas);
-        } catch (err) {
-            modalBody.innerHTML = '<div style="color: #ef4444; font-weight: 500;">PDF გვერდის რენდერის შეცდომა.</div>';
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+            } catch (err) {
+                console.error(`Error rendering page ${i}`, err);
+            }
         }
-    }
-
-    function jumpToPdfPage(pageNum) {
-        if (!currentPdfDoc) return;
-        let page = parseInt(pageNum);
-        if (isNaN(page) || page < 1) page = 1;
-        if (page > currentPdfDoc.numPages) page = currentPdfDoc.numPages;
-        document.getElementById('pdfPageInput').value = page;
-        renderCurrentPdfPage();
     }
 
     function handleExcelSearch(event) {
@@ -1554,7 +1535,7 @@
         if (!table) return;
         const rows = table.querySelectorAll('tr');
         rows.forEach((row, index) => {
-            if (index === 0) return; // სვეტების სათაურის (A, B, C...) დატოვება
+            if (index === 0) return;
             const text = row.textContent.toLowerCase();
             if (query === '' || text.includes(query)) {
                 row.style.display = '';
@@ -1569,7 +1550,7 @@
         document.getElementById('zoomLabel').textContent = Math.round(currentZoom * 100) + '%';
         
         if (currentPdfDoc) {
-            renderCurrentPdfPage();
+            renderAllPdfPages();
             return;
         }
 
