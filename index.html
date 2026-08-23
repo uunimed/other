@@ -347,7 +347,7 @@
             background: #f8fafc;
         }
 
-        /* კასტუმური Dropdown-ის დიზაინი (ფოტოს მიხედვით) */
+        /* კასტუმური Dropdown-ის დიზაინი */
         .custom-dropdown-container {
             position: absolute;
             top: 100%;
@@ -473,7 +473,7 @@
             font-size: 10px;
         }
         .preview-mini-table td {
-            border: 1px solid #cbd5e1;
+            border: 1px solid #94a3b8;
             padding: 3px 4px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -728,34 +728,60 @@
             fill: var(--text);
         }
 
-        /* Excel ცხრილის მკაფიო ბადის დიზაინი */
+        /* Excel ცხრილის პროფესიონალური ბადის და სვეტების/რიგების დიზაინი */
         .excel-table-container {
             width: 100%;
             height: 100%;
             overflow: auto;
-            background: white;
-            padding: 24px;
+            background: #ffffff;
+            padding: 0;
         }
 
         table.excel-rendered {
             width: 100%;
             border-collapse: collapse !important;
             font-size: 13px;
+            background-color: #ffffff;
         }
 
         table.excel-rendered th, table.excel-rendered td {
             border: 1px solid #cbd5e1 !important;
-            padding: 10px 14px;
+            padding: 8px 12px;
             text-align: left;
+            background-color: #ffffff;
+            white-space: nowrap;
         }
 
         table.excel-rendered th {
             background-color: #f1f5f9 !important;
             font-weight: 600;
-            color: var(--text);
+            color: #0f172a;
+            text-align: center;
             position: sticky;
             top: 0;
             z-index: 10;
+        }
+
+        table.excel-rendered td.excel-row-header {
+            background-color: #f1f5f9 !important;
+            color: #64748b;
+            font-weight: 600;
+            text-align: center;
+            width: 50px;
+            min-width: 50px;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+
+        table.excel-rendered th.excel-corner-cell {
+            background-color: #e2e8f0 !important;
+            width: 50px;
+            min-width: 50px;
+            position: sticky;
+            left: 0;
+            top: 0;
+            z-index: 15;
         }
 
         .empty-state {
@@ -1351,6 +1377,14 @@
         reader.readAsDataURL(file);
     }
 
+    function getExcelColumnName(n) {
+        let name = '';
+        for (let i = n + 1; i > 0; i = Math.floor((i - 1) / 26)) {
+            name = String.fromCharCode(65 + ((i - 1) % 26)) + name;
+        }
+        return name;
+    }
+
     async function openFile(index) {
         const file = filesData[index];
         currentActiveFile = file;
@@ -1393,9 +1427,32 @@
                     const workbook = XLSX.read(base64Data, { type: 'base64', codepage: 65001 });
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
-                    const htmlTable = XLSX.utils.sheet_to_html(worksheet, { header: '<table class="excel-rendered" id="zoomableContent">' });
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-                    modalBody.innerHTML = `<div class="excel-table-container">${htmlTable}</div>`;
+                    let maxCols = 0;
+                    jsonData.forEach(row => {
+                        if (row.length > maxCols) maxCols = row.length;
+                    });
+                    maxCols = Math.max(maxCols, 5);
+
+                    let html = '<table class="excel-rendered" id="zoomableContent">';
+                    html += '<thead><tr><th class="excel-corner-cell"></th>';
+                    for (let c = 0; c < maxCols; c++) {
+                        html += `<th>${getExcelColumnName(c)}</th>`;
+                    }
+                    html += '</tr></thead><tbody>';
+
+                    jsonData.forEach((row, rowIndex) => {
+                        html += `<tr><td class="excel-row-header">${rowIndex + 1}</td>`;
+                        for (let c = 0; c < maxCols; c++) {
+                            const val = row[c] !== undefined ? row[c] : '';
+                            html += `<td>${val}</td>`;
+                        }
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table>';
+
+                    modalBody.innerHTML = `<div class="excel-table-container">${html}</div>`;
                     pageInfo.textContent = `${file.name} (Excel ცხრილი)`;
                     return;
                 }
@@ -1497,7 +1554,7 @@
         if (!table) return;
         const rows = table.querySelectorAll('tr');
         rows.forEach((row, index) => {
-            if (index === 0) return;
+            if (index === 0) return; // სვეტების სათაურის (A, B, C...) დატოვება
             const text = row.textContent.toLowerCase();
             if (query === '' || text.includes(query)) {
                 row.style.display = '';
@@ -1557,7 +1614,7 @@
                             body { font-family: 'Inter', sans-serif; padding: 20px; color: #000; }
                             table { width: 100%; border-collapse: collapse !important; font-size: 13px; }
                             th, td { border: 1px solid #000 !important; padding: 8px 12px; text-align: left; }
-                            th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; }
+                            th, td.excel-row-header { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; }
                         </style>
                     </head>
                     <body>
