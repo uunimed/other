@@ -32,6 +32,26 @@
             --radius: 16px;
         }
 
+        /* თანამედროვე და ორიგინალური კასტუმური სქროლვის ხაზები ყველგან */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(241, 245, 249, 0.5);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+            border: 1.5px solid transparent;
+            background-clip: padding-box;
+            transition: background 0.2s ease;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -292,6 +312,7 @@
 
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
 
         label {
@@ -310,7 +331,7 @@
             font-size: 14px;
             font-family: inherit;
             color: var(--text);
-            background: #ffffff; /* ღია ფონი */
+            background: #ffffff;
             transition: all 0.2s ease;
         }
 
@@ -324,6 +345,35 @@
             padding: 10px;
             cursor: pointer;
             background: #f8fafc;
+        }
+
+        /* კასტუმური Dropdown-ის დიზაინი (ფოტოს მიხედვით) */
+        .custom-dropdown-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-top: 4px;
+            max-height: 160px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .custom-dropdown-item {
+            padding: 10px 16px;
+            font-size: 14px;
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .custom-dropdown-item:hover {
+            background: #f1f5f9;
         }
 
         .location-section {
@@ -612,7 +662,7 @@
             flex-direction: column;
             align-items: center;
             background: #f8fafc;
-            overflow: auto; /* სქროლვის ხაზი */
+            overflow: auto;
             position: relative;
         }
 
@@ -694,7 +744,7 @@
         }
 
         table.excel-rendered th, table.excel-rendered td {
-            border: 1px solid #cbd5e1 !important; /* უჯრედების ხაზები */
+            border: 1px solid #cbd5e1 !important;
             padding: 10px 14px;
             text-align: left;
         }
@@ -790,8 +840,11 @@
                 </div>
                 <div class="form-group">
                     <label for="fileLocation">ადგილი / კატეგორია</label>
-                    <input type="text" id="fileLocation" list="categoryOptions" placeholder="აირჩიეთ არსებული ან აკრიფეთ ახალი კატეგორია" autocomplete="off" style="background: #ffffff;">
-                    <datalist id="categoryOptions"></datalist>
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <input type="text" id="fileLocation" placeholder="აირჩიეთ არსებული ან აკრიფეთ ახალი კატეგორია" autocomplete="off" style="background: #ffffff; padding-right: 40px;" onfocus="openCategoryDropdown()" oninput="filterCategoryDropdown(event)">
+                        <svg viewBox="0 0 24 24" onclick="toggleCategoryDropdown(event)" style="position: absolute; right: 12px; width: 18px; height: 18px; fill: var(--text-muted); cursor: pointer;"><path d="M7 10l5 5 5-5z"/></svg>
+                    </div>
+                    <div id="customCategoryDropdown" class="custom-dropdown-container"></div>
                 </div>
                 <div class="form-group">
                     <label for="fileInput">აირჩიეთ ფაილი (PDF, სურათი, Excel და ა.შ.)</label>
@@ -916,6 +969,14 @@
         } else {
             showLogin();
         }
+
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('customCategoryDropdown');
+            const wrapper = document.getElementById('fileLocation')?.closest('.form-group');
+            if (dropdown && wrapper && !wrapper.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
     });
 
     function refreshData() {
@@ -963,24 +1024,58 @@
                 });
             }
             renderFiles();
-            updateCategoryDatalist();
         }, (error) => {
             showToast('მონაცემთა ბაზასთან კავშირის შეცდომა', 'error');
         });
     }
 
-    function updateCategoryDatalist() {
-        const datalist = document.getElementById('categoryOptions');
-        if (!datalist) return;
-        datalist.innerHTML = '';
+    function getCategoriesList() {
         const categories = [...new Set(filesData.map(f => f.location).filter(Boolean))];
         if (!categories.includes('ზოგადი')) categories.unshift('ზოგადი');
+        return categories;
+    }
 
-        categories.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat;
-            datalist.appendChild(option);
-        });
+    function renderCategoryDropdownOptions(filterText = '') {
+        const dropdown = document.getElementById('customCategoryDropdown');
+        if (!dropdown) return;
+
+        const categories = getCategoriesList();
+        const filtered = categories.filter(cat => cat.toLowerCase().includes(filterText.toLowerCase()));
+
+        if (filtered.length === 0) {
+            dropdown.style.display = 'none';
+            return;
+        }
+
+        dropdown.innerHTML = filtered.map(cat => `
+            <div class="custom-dropdown-item" onclick="selectCategoryItem('${cat}')">${cat}</div>
+        `).join('');
+        dropdown.style.display = 'block';
+    }
+
+    function toggleCategoryDropdown(e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById('customCategoryDropdown');
+        if (dropdown.style.display === 'block') {
+            dropdown.style.display = 'none';
+        } else {
+            const val = document.getElementById('fileLocation').value;
+            renderCategoryDropdownOptions(val);
+        }
+    }
+
+    function openCategoryDropdown() {
+        const val = document.getElementById('fileLocation').value;
+        renderCategoryDropdownOptions(val);
+    }
+
+    function filterCategoryDropdown(e) {
+        renderCategoryDropdownOptions(e.target.value);
+    }
+
+    function selectCategoryItem(cat) {
+        document.getElementById('fileLocation').value = cat;
+        document.getElementById('customCategoryDropdown').style.display = 'none';
     }
 
     function handleSearch(event) {
@@ -990,7 +1085,6 @@
 
     function openUploadModal() {
         document.getElementById('uploadModal').style.display = 'flex';
-        updateCategoryDatalist();
     }
 
     function closeUploadModal() {
@@ -999,6 +1093,8 @@
         document.getElementById('fileLocation').value = '';
         document.getElementById('fileInput').value = '';
         document.getElementById('uploadPreview').innerHTML = '<span class="preview-placeholder">ფაილი არ არის არჩეული</span>';
+        const dropdown = document.getElementById('customCategoryDropdown');
+        if (dropdown) dropdown.style.display = 'none';
     }
 
     async function renderPdfThumbnail(dataUrl, containerElement) {
@@ -1401,7 +1497,7 @@
         if (!table) return;
         const rows = table.querySelectorAll('tr');
         rows.forEach((row, index) => {
-            if (index === 0) return; // სათაურის დატოვება
+            if (index === 0) return;
             const text = row.textContent.toLowerCase();
             if (query === '' || text.includes(query)) {
                 row.style.display = '';
