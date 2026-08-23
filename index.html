@@ -16,8 +16,8 @@
             --text: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-            --radius: 12px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --radius: 16px;
         }
 
         * {
@@ -31,74 +31,181 @@
             background-color: var(--bg);
             color: var(--text);
             line-height: 1.5;
-            padding: 40px 20px;
+            min-height: 100vh;
         }
 
+        /* სრული სიგანის კონტეინერი */
         .container {
-            max-width: 1000px;
-            margin: 0 auto;
+            width: 100%;
+            padding: 30px 40px;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 40px;
+        /* თანამედროვე ავტორიზაციის გვერდი */
+        .login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%);
+            padding: 20px;
         }
 
-        header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--text);
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            padding: 48px 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 440px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .login-card h2 {
             margin-bottom: 8px;
+            font-size: 26px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text);
         }
 
-        header p {
+        .login-card p {
+            text-align: center;
             color: var(--text-muted);
-            font-size: 15px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            font-size: 14px;
             margin-bottom: 30px;
         }
 
-        .card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
+        /* Toast შეტყობინებების კონტეინერი (მარჯვენა ქვედა კუთხე) */
+        #toastContainer {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: #0f172a;
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: 12px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            pointer-events: auto;
+            border-left: 4px solid #ef4444;
+            max-width: 350px;
+        }
+
+        .toast.success {
+            border-left-color: #10b981;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(120%); opacity: 0; }
+        }
+
+        /* ზედა ნავიგაცია */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 24px;
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            font-weight: 700;
             color: var(--text);
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 14px;
         }
 
+        .header-actions {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+
+        /* ღილაკები */
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+            transform: none;
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        /* ფორმის ელემენტები */
         .form-group {
             margin-bottom: 20px;
-        }
-
-        .form-group.full {
-            grid-column: span 2;
         }
 
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text);
         }
 
-        input[type="text"], input[type="file"] {
+        input[type="text"], input[type="password"], input[type="file"] {
             width: 100%;
             padding: 12px 16px;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 14px;
             font-family: inherit;
             color: var(--text);
@@ -106,10 +213,10 @@
             transition: all 0.2s ease;
         }
 
-        input[type="text"]:focus, input[type="file"]:focus {
+        input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
 
         input[type="file"] {
@@ -118,27 +225,7 @@
             background: #f8fafc;
         }
 
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 600;
-            width: 100%;
-            transition: background 0.2s ease, transform 0.1s ease;
-        }
-
-        .btn:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
+        /* სექციები და ფაილების ბადე */
         .location-section {
             margin-top: 35px;
         }
@@ -158,7 +245,7 @@
             color: var(--text);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .file-count {
@@ -166,48 +253,95 @@
             color: var(--primary);
             font-size: 12px;
             font-weight: 600;
-            padding: 2px 8px;
+            padding: 3px 10px;
             border-radius: 20px;
         }
 
         .file-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
         }
 
+        /* ფაილის ბარათი Preview-თი */
         .file-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 16px;
-            text-align: left;
+            overflow: hidden;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
             display: flex;
-            align-items: center;
-            gap: 12px;
+            flex-direction: column;
         }
 
         .file-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.08);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -6px rgba(0,0,0,0.08);
             border-color: var(--primary);
         }
 
-        .file-icon {
-            font-size: 28px;
+        .file-card-preview {
+            width: 100%;
+            height: 140px;
             background: #f1f5f9;
-            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .file-card-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .file-card-preview-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .file-card-footer {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+        }
+
+        .file-icon-box {
+            width: 38px;
+            height: 38px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .file-icon-box.image { background: #dbeafe; fill: #2563eb; }
+        .file-icon-box.pdf { background: #fee2e2; fill: #dc2626; }
+        .file-icon-box.excel { background: #d1fae5; fill: #059669; }
+        .file-icon-box.default { background: #f3f4f6; fill: #4b5563; }
+
+        .file-icon-box svg {
+            width: 20px;
+            height: 20px;
         }
 
         .file-info {
             overflow: hidden;
+            flex: 1;
         }
 
         .file-title {
@@ -227,7 +361,34 @@
             letter-spacing: 0.5px;
         }
 
-        /* Popup Modal სტილები */
+        /* Preview ატვირთვის ფანჯარაში */
+        .upload-preview-container {
+            margin-top: 10px;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            background: #f8fafc;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .upload-preview-container img {
+            max-width: 100%;
+            max-height: 160px;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+
+        .preview-placeholder {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* Popup Modals */
         .modal {
             display: none;
             position: fixed;
@@ -235,8 +396,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(6px);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -245,24 +406,30 @@
 
         .modal-content {
             background: white;
-            width: 100%;
-            max-width: 950px;
-            height: 85vh;
-            border-radius: 16px;
+            width: 95vw;
+            max-width: 1400px;
+            height: 92vh;
+            border-radius: 20px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            animation: modalIn 0.25s ease;
+            animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-content.upload-modal {
+            max-width: 650px;
+            height: auto;
+            max-height: 90vh;
         }
 
         @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95); }
+            from { opacity: 0; transform: scale(0.96); }
             to { opacity: 1; transform: scale(1); }
         }
 
         .modal-header {
-            padding: 16px 24px;
+            padding: 20px 28px;
             background: #ffffff;
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -271,24 +438,29 @@
         }
 
         .modal-header h3 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             color: var(--text);
+        }
+
+        .modal-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .close-btn {
             background: #f1f5f9;
             border: none;
             color: var(--text-muted);
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
 
         .close-btn:hover {
@@ -306,11 +478,19 @@
             overflow: hidden;
         }
 
+        .modal-body.upload-body {
+            padding: 30px;
+            flex-direction: column;
+            align-items: stretch;
+            overflow-y: auto;
+        }
+
         .modal-body iframe, .modal-body img {
             width: 100%;
             height: 100%;
             border: none;
             object-fit: contain;
+            background: white;
         }
 
         /* Excel ცხრილის დიზაინი პოპაპში */
@@ -319,7 +499,7 @@
             height: 100%;
             overflow: auto;
             background: white;
-            padding: 20px;
+            padding: 24px;
         }
 
         table.excel-rendered {
@@ -345,66 +525,222 @@
 
         .empty-state {
             text-align: center;
-            padding: 40px;
+            padding: 60px;
             color: var(--text-muted);
-            font-size: 14px;
+            font-size: 15px;
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>პერსონალური ფაილების მენეჯერი</h1>
-        <p>შეინახეთ, დაახარისხეთ და გახსენით ფაილები უსაფრთხოდ ერთ სივრცეში</p>
-    </header>
+    <!-- Toast შეტყობინებების სივრცე -->
+    <div id="toastContainer"></div>
 
-    <!-- ატვირთვის ფორმა -->
-    <div class="card">
-        <h3>ახალი ფაილის ატვირთვა</h3>
-        <div class="form-grid">
+    <!-- ავტორიზაციის გვერდი -->
+    <div id="loginView" class="login-wrapper">
+        <div class="login-card">
+            <h2>მოგესალმებით</h2>
+            <p>გთხოვთ გაიაროთ ავტორიზაცია სისტემაში შესასვლელად</p>
             <div class="form-group">
-                <label for="fileTitle">ფაილის სათაური</label>
-                <input type="text" id="fileTitle" placeholder="მაგ: პასპორტის ასლი">
+                <label for="usernameInput">მომხმარებელი</label>
+                <input type="text" id="usernameInput" placeholder="შეიყვანეთ სახელი">
             </div>
             <div class="form-group">
-                <label for="fileLocation">ადგილი / კატეგორია</label>
-                <input type="text" id="fileLocation" placeholder="მაგ: დოკუმენტები, ფოტოები, X">
+                <label for="passwordInput">პაროლი</label>
+                <input type="password" id="passwordInput" placeholder="შეიყვანეთ პაროლი">
             </div>
-            <div class="form-group full">
-                <label for="fileInput">აირჩიეთ ფაილი (PDF, სურათი, Excel და ა.შ.)</label>
-                <input type="file" id="fileInput">
-            </div>
+            <button class="btn" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="handleLogin()">შესვლა</button>
         </div>
-        <button class="btn" onclick="uploadFile()">ატვირთვა</button>
     </div>
 
-    <!-- ფაილების კონტეინერი -->
-    <div id="locationsContainer"></div>
-</div>
+    <!-- მთავარი აპლიკაცია -->
+    <div id="appView" class="container hidden">
+        <header>
+            <div class="header-title">
+                <h1>პერსონალური ფაილების მენეჯერი</h1>
+                <p>შეინახეთ, დაახარისხეთ და გახსენით ფაილები უსაფრთხოდ</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn" onclick="openUploadModal()">
+                    <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    ფაილის დამატება
+                </button>
+                <button class="btn btn-outline btn-danger" onclick="handleLogout()" style="color: #ef4444; border-color: #fecaca;">გასვლა</button>
+            </div>
+        </header>
 
-<!-- Popup Modal ფანჯარა -->
-<div class="modal" id="fileModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="modalTitle">ფაილი</h3>
-            <button class="close-btn" onclick="closeModal()">&times;</button>
-        </div>
-        <div class="modal-body" id="modalBody">
-            <!-- დინამიური კონტენტი -->
+        <!-- ფაილების კონტეინერი -->
+        <div id="locationsContainer"></div>
+    </div>
+
+    <!-- ატვირთვის Modal (დიდი ზომის) -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content upload-modal">
+            <div class="modal-header">
+                <h3>ახალი ფაილის ატვირთვა</h3>
+                <button class="close-btn" onclick="closeUploadModal()">
+                    <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body upload-body">
+                <div class="form-group">
+                    <label for="fileTitle">ფაილის სათაური</label>
+                    <input type="text" id="fileTitle" placeholder="მაგ: პასპორტის ასლი">
+                </div>
+                <div class="form-group">
+                    <label for="fileLocation">ადგილი / კატეგორია</label>
+                    <input type="text" id="fileLocation" placeholder="მაგ: დოკუმენტები, ფოტოები">
+                </div>
+                <div class="form-group">
+                    <label for="fileInput">აირჩიეთ ფაილი (PDF, სურათი, Excel და ა.შ.)</label>
+                    <input type="file" id="fileInput" onchange="previewFile(event)">
+                </div>
+                <div class="form-group">
+                    <label>წინასწარი ნახაზი (Preview)</label>
+                    <div class="upload-preview-container" id="uploadPreview">
+                        <span class="preview-placeholder">ფაილი არ არის არჩეული</span>
+                    </div>
+                </div>
+                <button class="btn" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="uploadFile()">ატვირთვა</button>
+            </div>
         </div>
     </div>
-</div>
+
+    <!-- ფაილის სანახავი Modal (დიდი ზომის, გადმოწერის ღილაკით) -->
+    <div class="modal" id="fileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">ფაილი</h3>
+                <div class="modal-header-actions">
+                    <a id="downloadModalBtn" class="btn btn-outline" download style="padding: 8px 16px; font-size: 13px; text-decoration: none;">
+                        <svg style="width:16px;height:16px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                        გადმოწერა
+                    </a>
+                    <button class="close-btn" onclick="closeModal()">
+                        <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- დინამიური კონტენტი -->
+            </div>
+        </div>
+    </div>
 
 <script>
+    // ვექტორული SVG იკონები
+    const icons = {
+        folder: '<svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>',
+        image: '<svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>',
+        pdf: '<svg viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1.5h1.5V14H19v1.5h-2V7h3.5v1.5zM9 9.5h1v-1H9v1z"/></svg>',
+        excel: '<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-2h2v2zm0-4H7v-2h2v2zm0-4H7V7h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>',
+        file: '<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>'
+    };
+
+    // Toast შეტყობინებების ჩვენება (მარჯვენა ქვედა კუთხეში)
+    function showToast(message, type = 'error') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `<span>${message}</span>`;
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'slideOutRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+            setTimeout(() => toast.remove(), 350);
+        }, 3500);
+    }
+
+    // ავტორიზაციის შემოწმება
+    document.addEventListener('DOMContentLoaded', () => {
+        const isAuth = localStorage.getItem('isLoggedIn') === 'true';
+        if (isAuth) {
+            showApp();
+        } else {
+            showLogin();
+        }
+    });
+
+    function handleLogin() {
+        const user = document.getElementById('usernameInput').value.trim();
+        const pass = document.getElementById('passwordInput').value.trim();
+
+        if (user === 'alex' && pass === '2911') {
+            localStorage.setItem('isLoggedIn', 'true');
+            showToast('წარმატებით შეხვედით სისტემაში!', 'success');
+            showApp();
+        } else {
+            showToast('არასწორი მომხმარებელი ან პაროლი!', 'error');
+        }
+    }
+
+    function handleLogout() {
+        localStorage.removeItem('isLoggedIn');
+        showToast('წარმატებით გავედით სისტემიდან', 'success');
+        showLogin();
+    }
+
+    function showLogin() {
+        document.getElementById('loginView').classList.remove('hidden');
+        document.getElementById('appView').classList.add('hidden');
+    }
+
+    function showApp() {
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('appView').classList.remove('hidden');
+        renderFiles();
+    }
+
+    // Modal მართვა
+    function openUploadModal() {
+        document.getElementById('uploadModal').style.display = 'flex';
+    }
+
+    function closeUploadModal() {
+        document.getElementById('uploadModal').style.display = 'none';
+        document.getElementById('fileTitle').value = '';
+        document.getElementById('fileLocation').value = '';
+        document.getElementById('fileInput').value = '';
+        document.getElementById('uploadPreview').innerHTML = '<span class="preview-placeholder">ფაილი არ არის არჩეული</span>';
+    }
+
     let filesData = JSON.parse(localStorage.getItem('myFiles')) || [];
+
+    // ატვირთვისას Preview-ს გენერაცია
+    function previewFile(event) {
+        const file = event.target.files[0];
+        const previewContainer = document.getElementById('uploadPreview');
+        
+        if (!file) {
+            previewContainer.innerHTML = '<span class="preview-placeholder">ფაილი არ არის არჩეული</span>';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (file.type.includes('image')) {
+                previewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            } else if (file.type.includes('pdf')) {
+                previewContainer.innerHTML = `<div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);font-weight:500;"><div style="width:28px;height:28px;fill:#dc2626">${icons.pdf}</div><span>${file.name} (PDF დოკუმენტი)</span></div>`;
+            } else if (file.type.includes('sheet') || file.type.includes('excel') || file.name.match(/\.xls[x]?$/i)) {
+                previewContainer.innerHTML = `<div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);font-weight:500;"><div style="width:28px;height:28px;fill:#059669">${icons.excel}</div><span>${file.name} (Excel ცხრილი)</span></div>`;
+            } else {
+                previewContainer.innerHTML = `<div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);font-weight:500;"><div style="width:28px;height:28px;fill:#4b5563">${icons.file}</div><span>${file.name}</span></div>`;
+            }
+        }
+        reader.readAsDataURL(file);
+    }
 
     function renderFiles() {
         const container = document.getElementById('locationsContainer');
         container.innerHTML = '';
 
         if (filesData.length === 0) {
-            container.innerHTML = `<div class="empty-state">ფაილები ჯერ არ არის ატვირთული.</div>`;
+            container.innerHTML = `<div class="empty-state">ფაილები ჯერ არ არის ატვირთული. გამოიყენეთ „ფაილის დამატება“ ღილაკი.</div>`;
             return;
         }
 
@@ -419,7 +755,7 @@
             let sectionHTML = `
                 <div class="location-section">
                     <div class="location-header">
-                        <div class="location-title">📁 ${location}</div>
+                        <div class="location-title"><div style="width:22px;height:22px;display:inline-block;fill:var(--primary);vertical-align:middle;margin-right:4px;">${icons.folder}</div> ${location}</div>
                         <span class="file-count">${files.length} ფაილი</span>
                     </div>
                     <div class="file-grid">
@@ -427,26 +763,39 @@
 
             files.forEach((file) => {
                 const globalIndex = filesData.indexOf(file);
-                let icon = '📄';
+                let svgIcon = icons.file;
+                let typeClass = 'default';
                 let typeLabel = 'დოკუმენტი';
+                let previewContent = '';
                 
                 if (file.type.includes('image')) {
-                    icon = '🖼️';
+                    svgIcon = icons.image;
+                    typeClass = 'image';
                     typeLabel = 'სურათი';
+                    previewContent = `<img src="${file.dataUrl}" alt="${file.title}">`;
                 } else if (file.type.includes('pdf')) {
-                    icon = '📕';
+                    svgIcon = icons.pdf;
+                    typeClass = 'pdf';
                     typeLabel = 'PDF ფაილი';
+                    previewContent = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#dc2626">${icons.pdf}</div><span>PDF პირველი გვერდი</span></div>`;
                 } else if (file.type.includes('sheet') || file.type.includes('excel') || (file.name && file.name.match(/\.xls[x]?$/i))) {
-                    icon = '📊';
+                    svgIcon = icons.excel;
+                    typeClass = 'excel';
                     typeLabel = 'Excel ცხრილი';
+                    previewContent = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#059669">${icons.excel}</div><span>Excel ცხრილი</span></div>`;
+                } else {
+                    previewContent = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#4b5563">${icons.file}</div><span>ფაილი</span></div>`;
                 }
 
                 sectionHTML += `
                     <div class="file-card" onclick="openFile(${globalIndex})">
-                        <div class="file-icon">${icon}</div>
-                        <div class="file-info">
-                            <div class="file-title" title="${file.title}">${file.title}</div>
-                            <div class="file-type-label">${typeLabel}</div>
+                        <div class="file-card-preview">${previewContent}</div>
+                        <div class="file-card-footer">
+                            <div class="file-icon-box ${typeClass}">${svgIcon}</div>
+                            <div class="file-info">
+                                <div class="file-title" title="${file.title}">${file.title}</div>
+                                <div class="file-type-label">${typeLabel}</div>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -463,7 +812,7 @@
         const fileInput = document.getElementById('fileInput');
 
         if (!titleInput.value || !fileInput.files[0]) {
-            alert('გთხოვთ მიუთითოთ სათაური და აირჩიოთ ფაილი!');
+            showToast('გთხოვთ მიუთითოთ სათაური და აირჩიოთ ფაილი!', 'error');
             return;
         }
 
@@ -474,7 +823,6 @@
             let fileType = file.type;
             const fileName = file.name.toLowerCase();
 
-            // ფაილის ტიპის ზუსტი იდენტიფიკაცია გაფართოების მიხედვით
             if (fileName.endsWith('.pdf')) {
                 fileType = 'application/pdf';
             } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
@@ -496,10 +844,8 @@
             filesData.push(newFile);
             localStorage.setItem('myFiles', JSON.stringify(filesData));
             
-            titleInput.value = '';
-            locationInput.value = '';
-            fileInput.value = '';
-
+            closeUploadModal();
+            showToast('ფაილი წარმატებით აიტვირთა!', 'success');
             renderFiles();
         };
 
@@ -511,16 +857,19 @@
         const modal = document.getElementById('fileModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalBody = document.getElementById('modalBody');
+        const downloadBtn = document.getElementById('downloadModalBtn');
 
         modalTitle.textContent = file.title;
-        modalBody.innerHTML = '<div style="color: var(--text-muted); font-size: 14px;">იტვირთება...</div>';
+        downloadBtn.href = file.dataUrl;
+        downloadBtn.download = file.name || file.title;
+
+        modalBody.innerHTML = '<div style="color: var(--text-muted); font-size: 15px;">იტვირთება...</div>';
         modal.style.display = 'flex';
 
         try {
             const isExcel = file.type.includes('sheet') || file.type.includes('excel') || (file.name && file.name.match(/\.xls[x]?$/i));
 
             if (isExcel) {
-                // Excel ფაილის დამუშავება ბიბლიოთეკით
                 const base64Data = file.dataUrl.split(',')[1];
                 const workbook = XLSX.read(base64Data, { type: 'base64' });
                 const firstSheetName = workbook.SheetNames[0];
@@ -540,7 +889,6 @@
             }
 
             if (file.type.includes('pdf')) {
-                // PDF ფაილის გარდაქმნა სწორ Blob-ად
                 const base64Data = file.dataUrl.split(',')[1];
                 const byteCharacters = atob(base64Data);
                 const byteNumbers = new Array(byteCharacters.length);
@@ -551,21 +899,22 @@
                 const blob = new Blob([byteArray], { type: 'application/pdf' });
                 const blobUrl = URL.createObjectURL(blob);
 
+                // #toolbar=0&navpanes=0 უზრუნველყოფს სტანდარტული მუქი პანელის დამალვას PDF-ში
                 const iframe = document.createElement('iframe');
-                iframe.src = blobUrl;
+                iframe.src = blobUrl + '#toolbar=0&navpanes=0&scrollbar=0';
                 modalBody.innerHTML = '';
                 modalBody.appendChild(iframe);
                 return;
             }
 
-            // ნებისმიერი სხვა ფაილისთვის
             const iframe = document.createElement('iframe');
             iframe.src = file.dataUrl;
             modalBody.innerHTML = '';
             modalBody.appendChild(iframe);
 
         } catch (error) {
-            modalBody.innerHTML = '<div style="color: #ef4444;">ფაილის გახსნა ვერ მოხერხდა.</div>';
+            modalBody.innerHTML = '<div style="color: #ef4444; font-weight: 500;">ფაილის გახსნა ვერ მოხერხდა.</div>';
+            showToast('ფაილის გახსნის შეცდომა', 'error');
         }
     }
 
@@ -575,14 +924,13 @@
         document.getElementById('modalBody').innerHTML = '';
     }
 
+    // ფაილის გახსნის პოპაპი აღარ იხურება გარეთ დაკლიკებით (მხოლოდ X ღილაკით)
     window.onclick = function(event) {
-        const modal = document.getElementById('fileModal');
-        if (event.target === modal) {
-            closeModal();
+        const uploadModal = document.getElementById('uploadModal');
+        if (event.target === uploadModal) {
+            closeUploadModal();
         }
     }
-
-    renderFiles();
 </script>
 
 </body>
