@@ -9,8 +9,16 @@
     <!-- SheetJS Excel წამკითხველი -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-    <!-- Mammoth.js Word (.docx) წამკითხველი -->
+    <!-- Mammoth.js Word (.docx) fallback წამკითხველი -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+    <!-- docx-preview Word ფაილების ორიგინალთან მიახლოებული რენდერისთვის -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx-preview@0.3.3/dist/docx-preview.min.js"></script>
+
+    <!-- Excel-ის PDF ექსპორტისთვის -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <!-- PDF.js თამბლეხებისთვის (მინიატურების ასაწყობად) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -325,7 +333,7 @@
             color: var(--text);
         }
 
-        input[type="text"], input[type="password"], input[type="file"] {
+        input[type="text"], input[type="password"], input[type="file"], input[type="number"] {
             width: 100%;
             padding: 12px 16px;
             border: 1px solid var(--border);
@@ -731,6 +739,167 @@
             fill: var(--text);
         }
 
+        .page-jump-group {
+            display: none;
+            gap: 8px;
+        }
+
+        .page-jump-input {
+            width: 74px !important;
+            height: 32px;
+            padding: 5px 9px !important;
+            border-radius: 8px !important;
+            font-size: 13px !important;
+            text-align: center;
+        }
+
+        .download-menu-wrapper {
+            position: relative;
+            display: flex;
+        }
+
+        .download-options-menu {
+            position: absolute;
+            right: 0;
+            bottom: calc(100% + 8px);
+            min-width: 180px;
+            padding: 6px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16);
+            display: none;
+            z-index: 50;
+        }
+
+        .download-options-menu.show {
+            display: block;
+        }
+
+        .download-option-btn {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: var(--text);
+            border-radius: 8px;
+            padding: 9px 10px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .download-option-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .modal-body.pdf-mode,
+        .modal-body.excel-mode {
+            padding: 0;
+            align-items: stretch;
+        }
+
+        .modal-body.word-mode {
+            align-items: stretch;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background: #e5e7eb;
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 18px;
+            user-select: text;
+        }
+
+        .pdf-page-shell {
+            position: relative;
+            width: min(calc(100% - 48px), 860px);
+            aspect-ratio: 0.707;
+            background: #ffffff;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.18);
+            overflow: hidden;
+            line-height: 1;
+            flex: 0 0 auto;
+            margin: 0 auto;
+        }
+
+        .pdf-page-shell canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            background: #ffffff;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .pdf-page-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            background: #ffffff;
+        }
+
+        .pdf-text-layer {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            line-height: 1;
+            text-align: initial;
+            user-select: text;
+            transform-origin: 0 0;
+        }
+
+        .pdf-text-layer span,
+        .pdf-text-layer br {
+            color: transparent;
+            position: absolute;
+            white-space: pre;
+            cursor: text;
+            transform-origin: 0% 0%;
+            user-select: text;
+        }
+
+        .pdf-text-layer ::selection {
+            background: rgba(99, 102, 241, 0.35);
+        }
+
+        .word-viewer-shell {
+            width: 100%;
+            min-height: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 24px 12px;
+        }
+
+        .word-render-container {
+            transform-origin: top center;
+            transition: transform 0.2s ease;
+        }
+
+        .word-render-container .docx-wrapper {
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+        .word-render-container section.docx {
+            margin: 0 auto 22px auto !important;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.12);
+        }
+
         /* Excel ცხრილის პროფესიონალური ბადის და სვეტების/რიგების დიზაინი */
         .excel-table-container {
             width: 100%;
@@ -738,21 +907,35 @@
             overflow: auto;
             background: #ffffff;
             padding: 0;
+            margin: 0;
+            position: relative;
         }
 
 table.excel-rendered {
-            width: 100%;
-            border-collapse: collapse !important;
+            width: max-content;
+            min-width: 100%;
+            border-collapse: separate !important;
+            border-spacing: 0;
             font-size: 13px;
             background-color: #ffffff;
         }
 
         table.excel-rendered th, table.excel-rendered td {
             border: 1px solid #cbd5e1 !important;
+            border-width: 0 1px 1px 0 !important;
             padding: 8px 12px;
             text-align: left;
             background-color: #ffffff;
             white-space: nowrap;
+        }
+
+        table.excel-rendered thead th {
+            border-top-width: 1px !important;
+        }
+
+        table.excel-rendered th:first-child,
+        table.excel-rendered td:first-child {
+            border-left-width: 1px !important;
         }
         
 
@@ -764,7 +947,8 @@ table.excel-rendered {
             text-align: center;
             position: sticky;
             top: 0;
-            z-index: 10;
+            z-index: 30;
+            background-clip: padding-box;
         }
 
         /* 2. მარცხენა რიგების ნომრები (1, 2, 3...) ფიქსირდება მარცხნივ */
@@ -777,7 +961,8 @@ table.excel-rendered {
             min-width: 50px;
             position: sticky;
             left: 0;
-            z-index: 5;
+            z-index: 25;
+            background-clip: padding-box;
         }
 
         /* 3. ზედა-მარცხენა კუთხის უჯრა ფიქსირდება ორივე მიმართულებით */
@@ -788,7 +973,7 @@ table.excel-rendered {
             position: sticky;
             left: 0;
             top: 0;
-            z-index: 20; /* უფრო მაღალი ზ-ინდექსი, რომ სხვებზე ზემოდან იყოს */
+            z-index: 40; /* უფრო მაღალი ზ-ინდექსი, რომ სხვებზე ზემოდან იყოს */
         }
 
         .empty-state {
@@ -911,6 +1096,11 @@ table.excel-rendered {
                 <div class="toolbar-group" id="generalPageInfoGroup">
                     <span id="pageInfo">დოკუმენტი</span>
                 </div>
+                <div class="toolbar-group page-jump-group" id="pageJumpGroup">
+                    <span>გვერდი</span>
+                    <input type="number" id="pageJumpInput" class="page-jump-input" min="1" value="1" onchange="jumpToPageFromInput()" onkeydown="handlePageJumpKey(event)">
+                    <span id="pageTotalLabel">/ 1</span>
+                </div>
                 <div class="toolbar-group" id="zoomGroup">
                     <button class="toolbar-btn" onclick="zoomFile(-0.1)" title="დაპატარავება">
                         <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
@@ -924,9 +1114,16 @@ table.excel-rendered {
                     <button class="toolbar-btn" onclick="printCurrentFile()" title="ბეჭდვა" style="width: 38px; height: 38px;">
                         <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
                     </button>
-                    <button class="toolbar-btn" onclick="downloadCurrentFile()" title="გადმოწერა" style="width: 38px; height: 38px;">
-                        <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                    </button>
+                    <div class="download-menu-wrapper" id="downloadMenuWrapper">
+                        <button class="toolbar-btn" onclick="downloadCurrentFile(event)" title="გადმოწერა" style="width: 38px; height: 38px;">
+                            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                        </button>
+                        <div class="download-options-menu" id="downloadOptionsMenu">
+                            <button class="download-option-btn" onclick="downloadExcelAsPdf()">გადმოწერა PDF</button>
+                            <button class="download-option-btn" onclick="downloadExcelAsWorkbook()">გადმოწერა Excel</button>
+                            <button class="download-option-btn" onclick="downloadExcelAsCsv()">გადმოწერა CSV</button>
+                        </div>
+                    </div>
                     <button class="toolbar-btn" onclick="confirmDeleteFile()" title="წაშლა" style="width: 38px; height: 38px; background: #fee2e2; border-color: #fca5a5;">
                         <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: #dc2626;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                     </button>
@@ -975,6 +1172,391 @@ table.excel-rendered {
     let currentActiveFile = null;
     let currentZoom = 1;
     let searchQuery = '';
+    let currentDocumentKind = null;
+    let currentPdfObjectUrl = null;
+    let pageJumpHandler = null;
+    let currentPageState = { total: 0, current: 1 };
+    let activeExcelWorkbook = null;
+    let activeExcelSheetName = '';
+    let activePdfDoc = null;
+    let pdfIntersectionObserver = null;
+    let activePdfRenderedPages = new Set();
+    let activePdfRenderingPages = new Map();
+    let activePdfRenderVersion = 0;
+
+    function getFileNameLower(file) {
+        return (file?.name || '').toLowerCase();
+    }
+
+    function isPdfFile(file) {
+        const name = getFileNameLower(file);
+        return (file?.type || '').includes('pdf') || name.endsWith('.pdf');
+    }
+
+    function isExcelFile(file) {
+        const name = getFileNameLower(file);
+        const type = file?.type || '';
+        return type.includes('sheet') || type.includes('excel') || type.includes('csv') || /\.xls[x]?$|\.csv$/i.test(name);
+    }
+
+    function isWordFile(file) {
+        const name = getFileNameLower(file);
+        const type = file?.type || '';
+        return !isExcelFile(file) && (type.includes('word') || type.includes('document') || name.endsWith('.docx'));
+    }
+
+    function isImageFile(file) {
+        const name = getFileNameLower(file);
+        return (file?.type || '').includes('image') || /\.(jpg|jpeg|png|webp)$/i.test(name);
+    }
+
+    function dataUrlToUint8Array(dataUrl) {
+        const base64Data = dataUrl.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        return new Uint8Array(byteNumbers);
+    }
+
+    function dataUrlToBlob(dataUrl, fallbackType = 'application/octet-stream') {
+        const mimeMatch = dataUrl.match(/^data:([^;,]+)/);
+        const mimeType = mimeMatch ? mimeMatch[1] : fallbackType;
+        return new Blob([dataUrlToUint8Array(dataUrl)], { type: mimeType || fallbackType });
+    }
+
+    function releasePdfObjectUrl() {
+        if (currentPdfObjectUrl) {
+            URL.revokeObjectURL(currentPdfObjectUrl);
+            currentPdfObjectUrl = null;
+        }
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function getSafeBaseName(file) {
+        const rawName = (file?.name || file?.title || 'document').replace(/\.[^/.]+$/, '');
+        return rawName.replace(/[\\/:*?"<>|]+/g, '_').trim() || 'document';
+    }
+
+    function downloadBlob(blob, fileName) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function closeDownloadOptions() {
+        document.getElementById('downloadOptionsMenu')?.classList.remove('show');
+    }
+
+    function setModalBodyMode(mode) {
+        const modalBody = document.getElementById('modalBody');
+        modalBody.classList.remove('pdf-mode', 'excel-mode', 'word-mode');
+        if (mode) modalBody.classList.add(`${mode}-mode`);
+    }
+
+    function hidePageJump() {
+        pageJumpHandler = null;
+        currentPageState = { total: 0, current: 1 };
+        const group = document.getElementById('pageJumpGroup');
+        if (group) group.style.display = 'none';
+    }
+
+    function setupPageJump(totalPages, onJump, initialPage = 1) {
+        const group = document.getElementById('pageJumpGroup');
+        const input = document.getElementById('pageJumpInput');
+        const totalLabel = document.getElementById('pageTotalLabel');
+        if (!group || !input || !totalLabel || !totalPages || totalPages < 1) {
+            hidePageJump();
+            return;
+        }
+
+        currentPageState = { total: totalPages, current: initialPage };
+        pageJumpHandler = onJump;
+        group.style.display = 'flex';
+        input.min = '1';
+        input.max = String(totalPages);
+        input.value = String(initialPage);
+        totalLabel.textContent = `/ ${totalPages}`;
+    }
+
+    function setPageJumpValue(pageNumber) {
+        const input = document.getElementById('pageJumpInput');
+        if (!input || !currentPageState.total) return;
+        const normalized = Math.max(1, Math.min(currentPageState.total, Number(pageNumber) || 1));
+        currentPageState.current = normalized;
+        input.value = String(normalized);
+    }
+
+    function jumpToPageFromInput() {
+        const input = document.getElementById('pageJumpInput');
+        if (!input || !pageJumpHandler || !currentPageState.total) return;
+        const pageNumber = Math.max(1, Math.min(currentPageState.total, Number(input.value) || 1));
+        setPageJumpValue(pageNumber);
+        pageJumpHandler(pageNumber);
+    }
+
+    function handlePageJumpKey(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            jumpToPageFromInput();
+            event.target.blur();
+        }
+    }
+
+    function cleanupPdfViewer() {
+        if (pdfIntersectionObserver) {
+            pdfIntersectionObserver.disconnect();
+            pdfIntersectionObserver = null;
+        }
+        activePdfDoc = null;
+        activePdfRenderedPages.clear();
+        activePdfRenderingPages.clear();
+        activePdfRenderVersion++;
+    }
+
+    function getPdfPageShell(pageNumber) {
+        return document.getElementById(`pdf_page_wrap_${pageNumber}`);
+    }
+
+    function createPdfPageShells(totalPages) {
+        const viewer = document.getElementById('zoomableContent');
+        if (!viewer) return;
+
+        const fragment = document.createDocumentFragment();
+        for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+            const pageShell = document.createElement('div');
+            pageShell.className = 'pdf-page-shell';
+            pageShell.id = `pdf_page_wrap_${pageNumber}`;
+            pageShell.dataset.pageNumber = String(pageNumber);
+            pageShell.innerHTML = '<div class="pdf-page-loading">იტვირთება...</div>';
+            fragment.appendChild(pageShell);
+        }
+        viewer.appendChild(fragment);
+    }
+
+    function renderSimplePdfTextLayer(textContent, viewport, container) {
+        if (!pdfjsLib.Util) return;
+
+        textContent.items.forEach((item) => {
+            if (!item.str) return;
+            const span = document.createElement('span');
+            span.textContent = item.str;
+
+            const transform = pdfjsLib.Util.transform(viewport.transform, item.transform);
+            const angle = Math.atan2(transform[1], transform[0]);
+            const fontHeight = Math.hypot(transform[2], transform[3]);
+
+            span.style.left = `${transform[4]}px`;
+            span.style.top = `${transform[5] - fontHeight}px`;
+            span.style.fontSize = `${fontHeight}px`;
+            span.style.transform = `rotate(${angle}rad)`;
+            span.style.fontFamily = 'sans-serif';
+            container.appendChild(span);
+        });
+    }
+
+    async function renderPdfPage(pageNumber) {
+        if (!activePdfDoc) return;
+        if (activePdfRenderedPages.has(pageNumber)) return;
+        if (activePdfRenderingPages.has(pageNumber)) return activePdfRenderingPages.get(pageNumber);
+
+        const version = activePdfRenderVersion;
+        const renderPromise = (async () => {
+            const pageShell = getPdfPageShell(pageNumber);
+            if (!pageShell || !activePdfDoc) return;
+
+            const page = await activePdfDoc.getPage(pageNumber);
+            if (version !== activePdfRenderVersion) return;
+
+            const viewport = page.getViewport({ scale: 1.35 * currentZoom });
+            const outputScale = window.devicePixelRatio || 1;
+
+            pageShell.style.width = `${viewport.width}px`;
+            pageShell.style.height = `${viewport.height}px`;
+            pageShell.style.aspectRatio = 'auto';
+            pageShell.innerHTML = '<canvas></canvas><div class="pdf-text-layer"></div>';
+
+            const canvas = pageShell.querySelector('canvas');
+            const textLayer = pageShell.querySelector('.pdf-text-layer');
+            const context = canvas.getContext('2d');
+
+            canvas.width = Math.floor(viewport.width * outputScale);
+            canvas.height = Math.floor(viewport.height * outputScale);
+            canvas.style.width = `${viewport.width}px`;
+            canvas.style.height = `${viewport.height}px`;
+
+            await page.render({
+                canvasContext: context,
+                viewport,
+                transform: outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null
+            }).promise;
+
+            if (version !== activePdfRenderVersion) return;
+
+            const textContent = await page.getTextContent();
+            if (version !== activePdfRenderVersion) return;
+
+            textLayer.innerHTML = '';
+            if (typeof pdfjsLib.renderTextLayer === 'function') {
+                const textLayerTask = pdfjsLib.renderTextLayer({
+                    textContentSource: textContent,
+                    container: textLayer,
+                    viewport,
+                    textDivs: []
+                });
+                if (textLayerTask?.promise) await textLayerTask.promise;
+            } else {
+                renderSimplePdfTextLayer(textContent, viewport, textLayer);
+            }
+
+            activePdfRenderedPages.add(pageNumber);
+        })().catch(() => {
+            const pageShell = getPdfPageShell(pageNumber);
+            if (pageShell) pageShell.innerHTML = '<div class="pdf-page-loading" style="color:#ef4444;">გვერდის ჩატვირთვა ვერ მოხერხდა</div>';
+        }).finally(() => {
+            activePdfRenderingPages.delete(pageNumber);
+        });
+
+        activePdfRenderingPages.set(pageNumber, renderPromise);
+        return renderPromise;
+    }
+
+    function setupPdfLazyRendering() {
+        const viewer = document.getElementById('zoomableContent');
+        if (!viewer) return;
+
+        if (pdfIntersectionObserver) pdfIntersectionObserver.disconnect();
+
+        if ('IntersectionObserver' in window) {
+            pdfIntersectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        renderPdfPage(Number(entry.target.dataset.pageNumber));
+                    }
+                });
+            }, {
+                root: viewer,
+                rootMargin: '700px 0px'
+            });
+
+            viewer.querySelectorAll('.pdf-page-shell').forEach((pageShell) => {
+                pdfIntersectionObserver.observe(pageShell);
+            });
+        } else {
+            renderPdfVisiblePages();
+        }
+
+        viewer.addEventListener('scroll', syncPdfPageFromScroll, { passive: true });
+        renderPdfPage(1);
+    }
+
+    function renderPdfVisiblePages() {
+        const viewer = document.getElementById('zoomableContent');
+        if (!viewer) return;
+
+        const viewerRect = viewer.getBoundingClientRect();
+        viewer.querySelectorAll('.pdf-page-shell').forEach((pageShell) => {
+            const rect = pageShell.getBoundingClientRect();
+            const isNearViewport = rect.bottom >= viewerRect.top - 700 && rect.top <= viewerRect.bottom + 700;
+            if (isNearViewport) renderPdfPage(Number(pageShell.dataset.pageNumber));
+        });
+    }
+
+    function syncPdfPageFromScroll() {
+        if (currentDocumentKind !== 'pdf' || !currentPageState.total) return;
+        const viewer = document.getElementById('zoomableContent');
+        if (!viewer) return;
+
+        const viewerTop = viewer.getBoundingClientRect().top;
+        let closestPage = currentPageState.current;
+        let closestDistance = Infinity;
+
+        viewer.querySelectorAll('.pdf-page-shell').forEach((pageShell) => {
+            const distance = Math.abs(pageShell.getBoundingClientRect().top - viewerTop - 12);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestPage = Number(pageShell.dataset.pageNumber);
+            }
+        });
+
+        setPageJumpValue(closestPage);
+        renderPdfVisiblePages();
+    }
+
+    function rerenderPdfVisiblePages() {
+        if (currentDocumentKind !== 'pdf' || !activePdfDoc) return;
+        const viewer = document.getElementById('zoomableContent');
+        if (!viewer) return;
+
+        activePdfRenderVersion++;
+        activePdfRenderedPages.clear();
+        activePdfRenderingPages.clear();
+
+        viewer.querySelectorAll('.pdf-page-shell').forEach((pageShell) => {
+            pageShell.style.width = '';
+            pageShell.style.height = '';
+            pageShell.style.aspectRatio = '0.707';
+            pageShell.innerHTML = '<div class="pdf-page-loading">იტვირთება...</div>';
+        });
+
+        renderPdfVisiblePages();
+        renderPdfPage(currentPageState.current || 1);
+    }
+
+    function getWordPages() {
+        const container = document.getElementById('zoomableContent');
+        if (!container) return [];
+        const pages = Array.from(container.querySelectorAll('section.docx'));
+        return pages.length ? pages : [container];
+    }
+
+    function readExcelData(file) {
+        const base64Data = file.dataUrl.split(',')[1];
+        const workbook = XLSX.read(base64Data, { type: 'base64', codepage: 65001, cellDates: true });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false, defval: '' });
+        return { workbook, firstSheetName, worksheet, jsonData };
+    }
+
+    function buildExcelTableHtml(jsonData) {
+        let maxCols = 0;
+        jsonData.forEach(row => {
+            if (row.length > maxCols) maxCols = row.length;
+        });
+        maxCols = Math.max(maxCols, 5);
+
+        let html = '<table class="excel-rendered" id="zoomableContent">';
+        html += '<thead><tr><th class="excel-corner-cell"></th>';
+        for (let c = 0; c < maxCols; c++) {
+            html += `<th>${getExcelColumnName(c)}</th>`;
+        }
+        html += '</tr></thead><tbody>';
+
+        jsonData.forEach((row, rowIndex) => {
+            html += `<tr><td class="excel-row-header">${rowIndex + 1}</td>`;
+            for (let c = 0; c < maxCols; c++) {
+                html += `<td>${escapeHtml(row[c])}</td>`;
+            }
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        return html;
+    }
 
     function showToast(message, type = 'error') {
         const container = document.getElementById('toastContainer');
@@ -1002,6 +1584,11 @@ table.excel-rendered {
             const wrapper = document.getElementById('fileLocation')?.closest('.form-group');
             if (dropdown && wrapper && !wrapper.contains(e.target)) {
                 dropdown.style.display = 'none';
+            }
+
+            const downloadWrapper = document.getElementById('downloadMenuWrapper');
+            if (downloadWrapper && !downloadWrapper.contains(e.target)) {
+                closeDownloadOptions();
             }
         });
     });
@@ -1153,11 +1740,8 @@ table.excel-rendered {
 
     function renderExcelThumbnail(dataUrl, containerElement) {
         try {
-            const base64Data = dataUrl.split(',')[1];
-            const workbook = XLSX.read(base64Data, { type: 'base64', codepage: 65001 });
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            const tempFile = { dataUrl };
+            const { jsonData } = readExcelData(tempFile);
 
             if (jsonData.length > 0) {
                 let html = '<table class="preview-mini-table">';
@@ -1167,7 +1751,7 @@ table.excel-rendered {
                     const row = jsonData[i];
                     const colsToShow = Math.min(row.length, 4);
                     for (let j = 0; j < colsToShow; j++) {
-                        html += `<td>${row[j] !== undefined ? row[j] : ''}</td>`;
+                        html += `<td>${escapeHtml(row[j])}</td>`;
                     }
                     html += '</tr>';
                 }
@@ -1400,6 +1984,13 @@ table.excel-rendered {
         const file = filesData[index];
         currentActiveFile = file;
         currentZoom = 1;
+        currentDocumentKind = null;
+        activeExcelWorkbook = null;
+        activeExcelSheetName = '';
+        cleanupPdfViewer();
+        releasePdfObjectUrl();
+        closeDownloadOptions();
+        hidePageJump();
 
         const modal = document.getElementById('fileModal');
         const modalTitle = document.getElementById('modalTitle');
@@ -1410,6 +2001,7 @@ table.excel-rendered {
         const generalPageInfoGroup = document.getElementById('generalPageInfoGroup');
         const zoomGroup = document.getElementById('zoomGroup');
 
+        modalBody.className = 'modal-body';
         modalTitle.textContent = file.title;
         zoomLabel.textContent = '100%';
         excelSearchContainer.style.display = 'none';
@@ -1427,75 +2019,61 @@ table.excel-rendered {
 
         setTimeout(async () => {
             try {
-                const isExcel = file.type.includes('sheet') || file.type.includes('excel') || (file.name && file.name.match(/\.xls[x]?$|\.csv$/i));
-                const isWord = !isExcel && (file.type.includes('word') || file.type.includes('document') || (file.name && file.name.endsWith('.docx')));
+                if (isWordFile(file)) {
+                    currentDocumentKind = 'word';
+                    setModalBodyMode('word');
+                    const byteArray = dataUrlToUint8Array(file.dataUrl);
+                    modalBody.innerHTML = `
+                        <div class="word-viewer-shell">
+                            <div id="zoomableContent" class="word-render-container"></div>
+                        </div>
+                    `;
 
-if (isWord) {
-                    const base64Data = file.dataUrl.split(',')[1];
-                    const byteCharacters = atob(base64Data);
-                    const byteNumbers = new Array(byteCharacters.length);
-                    for (let i = 0; i < byteCharacters.length; i++) {
-                        byteNumbers[i] = byteCharacters.charCodeAt(i);
-                    }
-                    const byteArray = new Uint8Array(byteNumbers);
-
-                    mammoth.convertToHtml({ arrayBuffer: byteArray.buffer })
-                        .then(function(result) {
-                            // აქ ვუცვლით სტილს, რომ ჰგავდეს რეალურ A4 ფურცელს (ორიგინალ ვიზუალთან მიახლოებული)
-                            modalBody.innerHTML = `
-                                <div style="background: white; padding: 2.5cm; max-width: 21cm; width: 100%; margin: 20px auto; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-radius: 4px; min-height: 29.7cm; color: #000; font-family: 'Inter', sans-serif; line-height: 1.6;" id="zoomableContent">
-                                    ${result.value}
-                                </div>
-                            `;
-                            pageInfo.textContent = `${file.name} (Word დოკუმენტი)`;
-                        })
-                        .catch(function(err) {
-                            modalBody.innerHTML = '<div style="color: #ef4444; font-weight: 500;">Word ფაილის წაკითხვა ვერ მოხერხდა.</div>';
-                            showToast('Word ფაილის წაკითხვის შეცდომა', 'error');
+                    const wordContainer = document.getElementById('zoomableContent');
+                    if (window.docx && typeof window.docx.renderAsync === 'function') {
+                        await window.docx.renderAsync(byteArray.buffer, wordContainer, null, {
+                            className: 'docx',
+                            inWrapper: true,
+                            ignoreWidth: false,
+                            ignoreHeight: false,
+                            ignoreFonts: false,
+                            breakPages: true,
+                            renderHeaders: true,
+                            renderFooters: true,
+                            renderFootnotes: true,
+                            renderEndnotes: true,
+                            useBase64URL: true
                         });
+                    } else {
+                        const result = await mammoth.convertToHtml({ arrayBuffer: byteArray.buffer });
+                        wordContainer.innerHTML = `<section class="docx" style="background:white;padding:2.5cm;max-width:21cm;width:100%;min-height:29.7cm;color:#000;line-height:1.6;">${result.value}</section>`;
+                    }
+
+                    const pages = getWordPages();
+                    setupPageJump(pages.length, (pageNumber) => {
+                        const page = getWordPages()[pageNumber - 1];
+                        if (page) page.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                    pageInfo.textContent = `${file.name} (Word — ${pages.length} გვერდი)`;
                     return;
                 }
 
-                if (isExcel) {
+                if (isExcelFile(file)) {
+                    currentDocumentKind = 'excel';
+                    setModalBodyMode('excel');
                     excelSearchContainer.style.display = 'flex';
                     document.getElementById('excelSearchInput').value = '';
 
-                    const base64Data = file.dataUrl.split(',')[1];
-                    const workbook = XLSX.read(base64Data, { type: 'base64', codepage: 65001 });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-                    let maxCols = 0;
-                    jsonData.forEach(row => {
-                        if (row.length > maxCols) maxCols = row.length;
-                    });
-                    maxCols = Math.max(maxCols, 5);
-
-                    let html = '<table class="excel-rendered" id="zoomableContent">';
-                    html += '<thead><tr><th class="excel-corner-cell"></th>';
-                    for (let c = 0; c < maxCols; c++) {
-                        html += `<th>${getExcelColumnName(c)}</th>`;
-                    }
-                    html += '</tr></thead><tbody>';
-
-                    jsonData.forEach((row, rowIndex) => {
-                        html += `<tr><td class="excel-row-header">${rowIndex + 1}</td>`;
-                        for (let c = 0; c < maxCols; c++) {
-                            const val = row[c] !== undefined ? row[c] : '';
-                            html += `<td>${val}</td>`;
-                        }
-                        html += '</tr>';
-                    });
-                    html += '</tbody></table>';
-
-                    modalBody.innerHTML = `<div class="excel-table-container">${html}</div>`;
+                    const { workbook, firstSheetName, jsonData } = readExcelData(file);
+                    activeExcelWorkbook = workbook;
+                    activeExcelSheetName = firstSheetName;
+                    modalBody.innerHTML = `<div class="excel-table-container">${buildExcelTableHtml(jsonData)}</div>`;
                     pageInfo.textContent = `${file.name} (Excel ცხრილი)`;
                     return;
                 }
 
-                if (file.type.includes('image') || file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
-                    modalBody.innerHTML = `<img src="${file.dataUrl}" alt="${file.title}" id="zoomableContent" style="cursor: zoom-in;">`;
+                if (isImageFile(file)) {
+                    modalBody.innerHTML = `<img src="${file.dataUrl}" alt="${escapeHtml(file.title)}" id="zoomableContent" style="cursor: zoom-in;">`;
                     pageInfo.textContent = `${file.name} (სურათი)`;
 
                     const imgElem = document.getElementById('zoomableContent');
@@ -1510,54 +2088,30 @@ if (isWord) {
                     return;
                 }
 
-if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
-                    // ტულბარის ზუმი დატოვე აქტიური, რომ შეძლო პდფ-ის გადიდება/დაპატარავებაც
-                    zoomGroup.style.display = 'flex'; 
+                if (isPdfFile(file)) {
+                    currentDocumentKind = 'pdf';
+                    setModalBodyMode('pdf');
 
-                    const base64Data = file.dataUrl.split(',')[1];
-                    const byteCharacters = atob(base64Data);
-                    const byteNumbers = new Array(byteCharacters.length);
-                    for (let i = 0; i < byteCharacters.length; i++) {
-                        byteNumbers[i] = byteCharacters.charCodeAt(i);
-                    }
-                    const byteArray = new Uint8Array(byteNumbers);
+                    const byteArray = dataUrlToUint8Array(file.dataUrl);
 
                     try {
                         const loadingTask = pdfjsLib.getDocument({ data: byteArray });
-                        const pdfDoc = await loadingTask.promise;
-                        const numPages = pdfDoc.numPages;
+                        activePdfDoc = await loadingTask.promise;
+                        const numPages = activePdfDoc.numPages;
 
-                        let pagesHtml = `<div id="zoomableContent" style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px 0; width: 100%;">`;
-                        
-                        // ვკითხულობთ და ვხატავთ ყველა გვერდს თანმიმდევრობით
-                        for (let i = 1; i <= numPages; i++) {
-                            pagesHtml += `<canvas id="pdf_page_${i}" style="box-shadow: 0 4px 15px rgba(0,0,0,0.15); border-radius: 4px; background: white; max-width: 100%;"></canvas>`;
-                        }
-                        pagesHtml += `</div>`;
-
-                        modalBody.innerHTML = pagesHtml;
+                        modalBody.innerHTML = `<div id="zoomableContent" class="pdf-viewer" aria-label="${escapeHtml(file.title || file.name || 'PDF')}"></div>`;
+                        createPdfPageShells(numPages);
+                        setupPdfLazyRendering();
+                        setupPageJump(numPages, async (pageNumber) => {
+                            setPageJumpValue(pageNumber);
+                            const pageShell = getPdfPageShell(pageNumber);
+                            if (pageShell) pageShell.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            await renderPdfPage(pageNumber);
+                        });
                         pageInfo.textContent = `${file.name} (PDF — ${numPages} გვერდი)`;
-
-                        // ვხატავთ თითოეულ გვერდს კანვასზე
-                        for (let i = 1; i <= numPages; i++) {
-                            const page = await pdfDoc.getPage(i);
-                            const viewport = page.getViewport({ scale: 1.5 }); // კარგი ხარისხის სკალირება
-                            const canvas = document.getElementById(`pdf_page_${i}`);
-                            if (!canvas) continue;
-                            
-                            const context = canvas.getContext('2d');
-                            canvas.height = viewport.height;
-                            canvas.width = viewport.width;
-
-                            await page.render({
-                                canvasContext: context,
-                                viewport: viewport
-                            }).promise;
-                        }
-
                     } catch (err) {
-                        modalBody.innerHTML = '<div style="color: #ef4444; font-weight: 500;">PDF ფაილის რენდერი ვერ მოხერხდა.</div>';
-                        showToast('PDF ფაილის წაკითხვის შეცდომა', 'error');
+                        modalBody.innerHTML = '<div style="color: #ef4444; font-weight: 500; padding: 24px;">PDF ფაილის გახსნა ვერ მოხერხდა.</div>';
+                        showToast('PDF ფაილის გახსნის შეცდომა', 'error');
                     }
                     return;
                 }
@@ -1597,16 +2151,36 @@ if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
     function zoomFile(delta) {
         currentZoom = Math.max(0.5, Math.min(3.0, currentZoom + delta));
         document.getElementById('zoomLabel').textContent = Math.round(currentZoom * 100) + '%';
-        
+
         const content = document.getElementById('zoomableContent');
+        if (!content) return;
+
+        if (currentDocumentKind === 'excel') {
+            content.style.fontSize = `${13 * currentZoom}px`;
+            content.style.transform = 'none';
+            return;
+        }
+
+        if (currentDocumentKind === 'pdf') {
+            rerenderPdfVisiblePages();
+            return;
+        }
+
         if (content) {
             content.style.transform = `scale(${currentZoom})`;
             content.style.transformOrigin = 'top center';
         }
     }
 
-    function downloadCurrentFile() {
+    function downloadCurrentFile(event) {
         if (!currentActiveFile) return;
+        if (event) event.stopPropagation();
+
+        if (isExcelFile(currentActiveFile)) {
+            document.getElementById('downloadOptionsMenu')?.classList.toggle('show');
+            return;
+        }
+
         const a = document.createElement('a');
         a.href = currentActiveFile.dataUrl;
         a.download = currentActiveFile.name || currentActiveFile.title;
@@ -1616,10 +2190,106 @@ if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
         showToast('ფაილი გადმოიწერა', 'success');
     }
 
+    function getActiveExcelData() {
+        if (!currentActiveFile || !isExcelFile(currentActiveFile)) return null;
+        return readExcelData(currentActiveFile);
+    }
+
+    async function downloadExcelAsPdf() {
+        if (!currentActiveFile || !isExcelFile(currentActiveFile)) return;
+        closeDownloadOptions();
+
+        if (!window.html2canvas || !window.jspdf?.jsPDF) {
+            showToast('PDF ექსპორტის ბიბლიოთეკა ვერ ჩაიტვირთა', 'error');
+            return;
+        }
+
+        const table = document.querySelector('table.excel-rendered');
+        if (!table) {
+            showToast('Excel ცხრილი ჯერ არ არის გახსნილი', 'error');
+            return;
+        }
+
+        try {
+            showToast('PDF მზადდება...', 'success');
+            const previousTransform = table.style.transform;
+            table.style.transform = 'none';
+
+            const canvas = await html2canvas(table, {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                useCORS: true,
+                scrollX: 0,
+                scrollY: 0,
+                windowWidth: table.scrollWidth,
+                windowHeight: table.scrollHeight
+            });
+            table.style.transform = previousTransform;
+
+            const { jsPDF } = window.jspdf;
+            const orientation = canvas.width > canvas.height ? 'landscape' : 'portrait';
+            const pdf = new jsPDF({ orientation, unit: 'pt', format: 'a4' });
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 24;
+            const printableWidth = pageWidth - margin * 2;
+            const printableHeight = pageHeight - margin * 2;
+            const ratio = canvas.width / printableWidth;
+            const sliceHeight = Math.floor(printableHeight * ratio);
+
+            let offsetY = 0;
+            let pageIndex = 0;
+            while (offsetY < canvas.height) {
+                const pageCanvas = document.createElement('canvas');
+                const currentSliceHeight = Math.min(sliceHeight, canvas.height - offsetY);
+                pageCanvas.width = canvas.width;
+                pageCanvas.height = currentSliceHeight;
+                const context = pageCanvas.getContext('2d');
+                context.fillStyle = '#ffffff';
+                context.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+                context.drawImage(canvas, 0, offsetY, canvas.width, currentSliceHeight, 0, 0, canvas.width, currentSliceHeight);
+
+                if (pageIndex > 0) pdf.addPage();
+                const imgData = pageCanvas.toDataURL('image/png');
+                const imgHeight = currentSliceHeight / ratio;
+                pdf.addImage(imgData, 'PNG', margin, margin, printableWidth, imgHeight);
+                offsetY += currentSliceHeight;
+                pageIndex++;
+            }
+
+            pdf.save(`${getSafeBaseName(currentActiveFile)}.pdf`);
+            showToast('PDF ფაილი გადმოიწერა', 'success');
+        } catch (error) {
+            showToast('PDF ექსპორტი ვერ მოხერხდა', 'error');
+        }
+    }
+
+    function downloadExcelAsWorkbook() {
+        const excelData = getActiveExcelData();
+        if (!excelData) return;
+        closeDownloadOptions();
+
+        const output = XLSX.write(excelData.workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([output], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        downloadBlob(blob, `${getSafeBaseName(currentActiveFile)}.xlsx`);
+        showToast('Excel ფაილი გადმოიწერა', 'success');
+    }
+
+    function downloadExcelAsCsv() {
+        const excelData = getActiveExcelData();
+        if (!excelData) return;
+        closeDownloadOptions();
+
+        const csv = XLSX.utils.sheet_to_csv(excelData.worksheet);
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        downloadBlob(blob, `${getSafeBaseName(currentActiveFile)}.csv`);
+        showToast('CSV ფაილი გადმოიწერა', 'success');
+    }
+
     function printCurrentFile() {
         if (!currentActiveFile) return;
         try {
-            const isExcel = currentActiveFile.type.includes('sheet') || currentActiveFile.type.includes('excel') || (currentActiveFile.name && currentActiveFile.name.match(/\.xls[x]?$|\.csv$/i));
+            const isExcel = isExcelFile(currentActiveFile);
             if (isExcel) {
                 const tableHtml = document.querySelector('#zoomableContent')?.outerHTML || '';
                 let printFrame = document.getElementById('printFrame');
@@ -1634,7 +2304,7 @@ if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
                 doc.write(`
                     <html>
                     <head>
-                        <title>${currentActiveFile.title}</title>
+                        <title></title>
                         <style>
                             body { font-family: 'Inter', sans-serif; padding: 20px; color: #000; }
                             table { width: 100%; border-collapse: collapse !important; font-size: 13px; }
@@ -1643,7 +2313,6 @@ if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
                         </style>
                     </head>
                     <body>
-                        <h2>${currentActiveFile.title}</h2>
                         ${tableHtml}
                     </body>
                     </html>
@@ -1656,7 +2325,7 @@ if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
                 return;
             }
 
-            const isWord = currentActiveFile.type.includes('word') || currentActiveFile.type.includes('document') || (currentActiveFile.name && currentActiveFile.name.endsWith('.docx'));
+            const isWord = isWordFile(currentActiveFile);
             if (isWord) {
                 const wordHtml = document.querySelector('#zoomableContent')?.innerHTML || '';
                 let printFrame = document.getElementById('printFrame');
@@ -1692,7 +2361,7 @@ if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
                 return;
             }
 
-            const isImage = currentActiveFile.type.includes('image') || (currentActiveFile.name && currentActiveFile.name.match(/\.(jpg|jpeg|png|webp)$/i));
+            const isImage = isImageFile(currentActiveFile);
             if (isImage) {
                 let printFrame = document.getElementById('printFrame');
                 if (!printFrame) {
@@ -1725,7 +2394,7 @@ if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
                 return;
             }
 
-            const isPdf = currentActiveFile.type.includes('pdf') || (currentActiveFile.name && currentActiveFile.name.endsWith('.pdf'));
+            const isPdf = isPdfFile(currentActiveFile);
             if (isPdf) {
                 const base64Data = currentActiveFile.dataUrl.split(',')[1];
                 const byteCharacters = atob(base64Data);
@@ -1802,8 +2471,18 @@ if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
     function closeModal() {
         const modal = document.getElementById('fileModal');
         modal.style.display = 'none';
-        document.getElementById('modalBody').innerHTML = '';
+        const modalBody = document.getElementById('modalBody');
+        modalBody.innerHTML = '';
+        modalBody.className = 'modal-body';
         currentActiveFile = null;
+        currentDocumentKind = null;
+        currentZoom = 1;
+        activeExcelWorkbook = null;
+        activeExcelSheetName = '';
+        cleanupPdfViewer();
+        hidePageJump();
+        closeDownloadOptions();
+        releasePdfObjectUrl();
     }
 </script>
 
