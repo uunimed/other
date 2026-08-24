@@ -740,7 +740,7 @@
             padding: 0;
         }
 
-        table.excel-rendered {
+table.excel-rendered {
             width: 100%;
             border-collapse: collapse !important;
             font-size: 13px;
@@ -754,7 +754,9 @@
             background-color: #ffffff;
             white-space: nowrap;
         }
+        
 
+        /* 1. ზედა სვეტების სათაურები (A, B, C...) ფიქსირდება ზემოთ */
         table.excel-rendered th {
             background-color: #f1f5f9 !important;
             font-weight: 600;
@@ -765,6 +767,7 @@
             z-index: 10;
         }
 
+        /* 2. მარცხენა რიგების ნომრები (1, 2, 3...) ფიქსირდება მარცხნივ */
         table.excel-rendered td.excel-row-header {
             background-color: #f1f5f9 !important;
             color: #64748b;
@@ -777,6 +780,7 @@
             z-index: 5;
         }
 
+        /* 3. ზედა-მარცხენა კუთხის უჯრა ფიქსირდება ორივე მიმართულებით */
         table.excel-rendered th.excel-corner-cell {
             background-color: #e2e8f0 !important;
             width: 50px;
@@ -784,7 +788,7 @@
             position: sticky;
             left: 0;
             top: 0;
-            z-index: 15;
+            z-index: 20; /* უფრო მაღალი ზ-ინდექსი, რომ სხვებზე ზემოდან იყოს */
         }
 
         .empty-state {
@@ -1424,9 +1428,9 @@
         setTimeout(async () => {
             try {
                 const isExcel = file.type.includes('sheet') || file.type.includes('excel') || (file.name && file.name.match(/\.xls[x]?$|\.csv$/i));
-                const isWord = file.type.includes('word') || file.type.includes('document') || (file.name && file.name.endsWith('.docx'));
+                const isWord = !isExcel && (file.type.includes('word') || file.type.includes('document') || (file.name && file.name.endsWith('.docx')));
 
-                if (isWord) {
+if (isWord) {
                     const base64Data = file.dataUrl.split(',')[1];
                     const byteCharacters = atob(base64Data);
                     const byteNumbers = new Array(byteCharacters.length);
@@ -1437,8 +1441,9 @@
 
                     mammoth.convertToHtml({ arrayBuffer: byteArray.buffer })
                         .then(function(result) {
+                            // აქ ვუცვლით სტილს, რომ ჰგავდეს რეალურ A4 ფურცელს (ორიგინალ ვიზუალთან მიახლოებული)
                             modalBody.innerHTML = `
-                                <div style="background: white; padding: 40px; max-width: 800px; width: 100%; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-radius: 8px; min-height: 100%; color: #0f172a; line-height: 1.6;" id="zoomableContent">
+                                <div style="background: white; padding: 2.5cm; max-width: 21cm; width: 100%; margin: 20px auto; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-radius: 4px; min-height: 29.7cm; color: #000; font-family: 'Inter', sans-serif; line-height: 1.6;" id="zoomableContent">
                                     ${result.value}
                                 </div>
                             `;
@@ -1505,9 +1510,10 @@
                     return;
                 }
 
-                if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
-                    zoomGroup.style.display = 'none';
-                    
+if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
+                    // ტულბარის ზუმი დატოვე აქტიური, რომ შეძლო პდფ-ის გადიდება/დაპატარავებაც
+                    zoomGroup.style.display = 'flex'; 
+
                     const base64Data = file.dataUrl.split(',')[1];
                     const byteCharacters = atob(base64Data);
                     const byteNumbers = new Array(byteCharacters.length);
@@ -1515,17 +1521,44 @@
                         byteNumbers[i] = byteCharacters.charCodeAt(i);
                     }
                     const byteArray = new Uint8Array(byteNumbers);
-                    const blob = new Blob([byteArray], { type: 'application/pdf' });
-                    const blobUrl = URL.createObjectURL(blob);
 
-                    const iframe = document.createElement('iframe');
-                    iframe.src = blobUrl;
-                    iframe.style.width = '100%';
-                    iframe.style.height = '100%';
-                    iframe.style.border = 'none';
-                    modalBody.innerHTML = '';
-                    modalBody.appendChild(iframe);
-                    pageInfo.textContent = `${file.name} (PDF დოკუმენტი)`;
+                    try {
+                        const loadingTask = pdfjsLib.getDocument({ data: byteArray });
+                        const pdfDoc = await loadingTask.promise;
+                        const numPages = pdfDoc.numPages;
+
+                        let pagesHtml = `<div id="zoomableContent" style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px 0; width: 100%;">`;
+                        
+                        // ვკითხულობთ და ვხატავთ ყველა გვერდს თანმიმდევრობით
+                        for (let i = 1; i <= numPages; i++) {
+                            pagesHtml += `<canvas id="pdf_page_${i}" style="box-shadow: 0 4px 15px rgba(0,0,0,0.15); border-radius: 4px; background: white; max-width: 100%;"></canvas>`;
+                        }
+                        pagesHtml += `</div>`;
+
+                        modalBody.innerHTML = pagesHtml;
+                        pageInfo.textContent = `${file.name} (PDF — ${numPages} გვერდი)`;
+
+                        // ვხატავთ თითოეულ გვერდს კანვასზე
+                        for (let i = 1; i <= numPages; i++) {
+                            const page = await pdfDoc.getPage(i);
+                            const viewport = page.getViewport({ scale: 1.5 }); // კარგი ხარისხის სკალირება
+                            const canvas = document.getElementById(`pdf_page_${i}`);
+                            if (!canvas) continue;
+                            
+                            const context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            await page.render({
+                                canvasContext: context,
+                                viewport: viewport
+                            }).promise;
+                        }
+
+                    } catch (err) {
+                        modalBody.innerHTML = '<div style="color: #ef4444; font-weight: 500;">PDF ფაილის რენდერი ვერ მოხერხდა.</div>';
+                        showToast('PDF ფაილის წაკითხვის შეცდომა', 'error');
+                    }
                     return;
                 }
 
