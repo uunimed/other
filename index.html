@@ -29,7 +29,7 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -1772,75 +1772,76 @@ function uploadFile() {
     const progressPercent = document.getElementById('uploadPercent');
 
     uploadBtn.disabled = true;
-    uploadBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; border-top-color: white;"></div> მიმდინარეობს ატვირთვა...';
+    uploadBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; border-top-color: white;"></div> მიმდინარეობს დამუშავება...';
     
-    // პროგრეს ბარის გამოჩენა
     progressContainer.classList.remove('hidden');
-    progressBar.style.width = '0%';
-    progressPercent.textContent = '0%';
+    progressBar.style.width = '10%';
+    progressPercent.textContent = '10%';
 
-    // უნიკალური გზა ფაილისთვის Firebase Storage-ში
-    const storageRef = firebase.storage().ref('uploads/' + Date.now() + '_' + file.name);
-    const uploadTask = storageRef.put(file);
+    const reader = new FileReader();
 
-    // ატვირთვის პროცესის (პროცენტების) მონიტორინგი
-    uploadTask.on('state_changed', 
-        (snapshot) => {
-            // პროცენტის გამოთვლა
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            const roundedProgress = Math.round(progress);
-            
-            progressBar.style.width = roundedProgress + '%';
-            progressPercent.textContent = roundedProgress + '%';
-        }, 
-        (error) => {
-            // შეცდომის დამუშავება
+    reader.onprogress = function(event) {
+        if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 80);
+            progressBar.style.width = percent + '%';
+            progressPercent.textContent = percent + '%';
+        }
+    };
+
+    reader.onload = function(e) {
+        progressBar.style.width = '90%';
+        progressPercent.textContent = '90%';
+
+        const dataUrl = e.target.result;
+        let fileType = file.type;
+        const fileName = file.name.toLowerCase();
+
+        if (fileName.endsWith('.pdf')) {
+            fileType = 'application/pdf';
+        } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || fileName.endsWith('.csv')) {
+            fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        } else if (fileName.endsWith('.docx')) {
+            fileType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        } else if (fileName.match(/\.(jpg|jpeg|webp)$/)) {
+            fileType = 'image/jpeg';
+        } else if (fileName.endsWith('.png')) {
+            fileType = 'image/png';
+        }
+
+        const newFile = {
+            title: titleInput.value,
+            location: locationInput.value.trim() || '-',
+            name: file.name,
+            type: fileType,
+            dataUrl: dataUrl
+        };
+
+        db.ref('files').push(newFile, (dbError) => {
             uploadBtn.disabled = false;
             uploadBtn.innerHTML = 'ატვირთვა';
-            progressContainer.classList.add('hidden');
-            showToast('ატვირთვის შეცდომა Storage-ში', 'error');
-        }, 
-        () => {
-            // წარმატებული ატვირთვის შემდეგ ლინკის მიღება და Realtime Database-ში შენახვა
-            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                let fileType = file.type;
-                const fileName = file.name.toLowerCase();
+            if (dbError) {
+                console.error("Database Save Error:", dbError);
+                showToast('ბაზაში შენახვის შეცდომა', 'error');
+            } else {
+                progressBar.style.width = '100%';
+                progressPercent.textContent = '100%';
+                setTimeout(() => {
+                    closeUploadModal();
+                    showToast('ფაილი წარმატებით აიტვირთა!', 'success');
+                }, 300);
+            }
+        });
+    };
 
-                if (fileName.endsWith('.pdf')) {
-                    fileType = 'application/pdf';
-                } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || fileName.endsWith('.csv')) {
-                    fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-                } else if (fileName.endsWith('.docx')) {
-                    fileType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-                } else if (fileName.match(/\.(jpg|jpeg|webp)$/)) {
-                    fileType = 'image/jpeg';
-                } else if (fileName.endsWith('.png')) {
-                    fileType = 'image/png';
-                }
+    reader.onerror = function() {
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = 'ატვირთვა';
+        progressContainer.classList.add('hidden');
+        showToast('ფაილის წაკითხვის შეცდომა', 'error');
+    };
 
-                const newFile = {
-                    title: titleInput.value,
-                    location: locationInput.value.trim() || '-',
-                    name: file.name,
-                    type: fileType,
-                    dataUrl: downloadURL // Base64-ის ნაცვლად ინახება Firebase Storage-ის URL
-                };
-
-                db.ref('files').push(newFile, (dbError) => {
-                    uploadBtn.disabled = false;
-                    uploadBtn.innerHTML = 'ატვირთვა';
-                    if (dbError) {
-                        showToast('ატვირთვის შეცდომა ბაზაში', 'error');
-                    } else {
-                        closeUploadModal();
-                        showToast('ფაილი წარმატებით აიტვირთა!', 'success');
-                    }
-                });
-            });
-        }
-    );
+    reader.readAsDataURL(file);
 }
-
     async function renderPdfThumbnail(dataUrl, containerElement) {
         try {
             const base64Data = dataUrl.split(',')[1];
