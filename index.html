@@ -1059,7 +1059,7 @@ table.excel-rendered {
         </div>
     </div>
 
-    <!-- ატვირთვის Modal -->
+<!-- ატვირთვის Modal -->
     <div class="modal" id="uploadModal">
         <div class="modal-content upload-modal">
             <div class="modal-header">
@@ -1091,6 +1091,18 @@ table.excel-rendered {
                         <span class="preview-placeholder">ფაილი არ არის არჩეული</span>
                     </div>
                 </div>
+
+                <!-- ატვირთვის პროგრეს ბარი -->
+                <div id="uploadProgressContainer" class="form-group hidden" style="margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; font-weight: 600; color: var(--text);">
+                        <span>ატვირთვის პროცესი:</span>
+                        <span id="uploadPercent">0%</span>
+                    </div>
+                    <div style="width: 100%; background-color: #e2e8f0; height: 10px; border-radius: 20px; overflow: hidden;">
+                        <div id="uploadProgressBar" style="width: 0%; height: 100%; background-color: var(--primary); transition: width 0.2s ease;"></div>
+                    </div>
+                </div>
+
                 <button class="btn" id="uploadBtn" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="uploadFile()">ატვირთვა</button>
             </div>
         </div>
@@ -1720,14 +1732,114 @@ table.excel-rendered {
     }
 
     function closeUploadModal() {
-        document.getElementById('uploadModal').style.display = 'none';
-        document.getElementById('fileTitle').value = '';
-        document.getElementById('fileLocation').value = '';
-        document.getElementById('fileInput').value = '';
-        document.getElementById('uploadPreview').innerHTML = '<span class="preview-placeholder">ფაილი არ არის არჩეული</span>';
-        const dropdown = document.getElementById('customCategoryDropdown');
-        if (dropdown) dropdown.style.display = 'none';
+    document.getElementById('uploadModal').style.display = 'none';
+    document.getElementById('fileTitle').value = '';
+    document.getElementById('fileLocation').value = '';
+    document.getElementById('fileInput').value = '';
+    document.getElementById('uploadPreview').innerHTML = '<span class="preview-placeholder">ფაილი არ არის არჩეული</span>';
+    
+    // პროგრეს ბარის გასუფთავება/დამალვა
+    const progressContainer = document.getElementById('uploadProgressContainer');
+    const progressBar = document.getElementById('uploadProgressBar');
+    const progressPercent = document.getElementById('uploadPercent');
+    if (progressContainer) progressContainer.classList.add('hidden');
+    if (progressBar) progressBar.style.width = '0%';
+    if (progressPercent) progressPercent.textContent = '0%';
+
+    const dropdown = document.getElementById('customCategoryDropdown');
+    if (dropdown) dropdown.style.display = 'none';
+}
+
+function uploadFile() {
+    const titleInput = document.getElementById('fileTitle');
+    const locationInput = document.getElementById('fileLocation');
+    const fileInput = document.getElementById('fileInput');
+
+    if (!titleInput.value || !fileInput.files[0]) {
+        showToast('გთხოვთ მიუთითოთ სათაური და აირჩიოთ ფაილი!', 'error');
+        return;
     }
+
+    const file = fileInput.files[0];
+    if (!validateFileFormat(file)) {
+        showToast('მხოლოდ გახსნადი ფორმატის ფაილებია დაშვებული!', 'error');
+        return;
+    }
+
+    const uploadBtn = document.getElementById('uploadBtn');
+    const progressContainer = document.getElementById('uploadProgressContainer');
+    const progressBar = document.getElementById('uploadProgressBar');
+    const progressPercent = document.getElementById('uploadPercent');
+
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; border-top-color: white;"></div> მიმდინარეობს ატვირთვა...';
+    
+    // პროგრეს ბარის გამოჩენა
+    progressContainer.classList.remove('hidden');
+    progressBar.style.width = '0%';
+    progressPercent.textContent = '0%';
+
+    // უნიკალური გზა ფაილისთვის Firebase Storage-ში
+    const storageRef = firebase.storage().ref('uploads/' + Date.now() + '_' + file.name);
+    const uploadTask = storageRef.put(file);
+
+    // ატვირთვის პროცესის (პროცენტების) მონიტორინგი
+    uploadTask.on('state_changed', 
+        (snapshot) => {
+            // პროცენტის გამოთვლა
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            const roundedProgress = Math.round(progress);
+            
+            progressBar.style.width = roundedProgress + '%';
+            progressPercent.textContent = roundedProgress + '%';
+        }, 
+        (error) => {
+            // შეცდომის დამუშავება
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = 'ატვირთვა';
+            progressContainer.classList.add('hidden');
+            showToast('ატვირთვის შეცდომა Storage-ში', 'error');
+        }, 
+        () => {
+            // წარმატებული ატვირთვის შემდეგ ლინკის მიღება და Realtime Database-ში შენახვა
+            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                let fileType = file.type;
+                const fileName = file.name.toLowerCase();
+
+                if (fileName.endsWith('.pdf')) {
+                    fileType = 'application/pdf';
+                } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || fileName.endsWith('.csv')) {
+                    fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                } else if (fileName.endsWith('.docx')) {
+                    fileType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                } else if (fileName.match(/\.(jpg|jpeg|webp)$/)) {
+                    fileType = 'image/jpeg';
+                } else if (fileName.endsWith('.png')) {
+                    fileType = 'image/png';
+                }
+
+                const newFile = {
+                    title: titleInput.value,
+                    location: locationInput.value.trim() || '-',
+                    name: file.name,
+                    type: fileType,
+                    dataUrl: downloadURL // Base64-ის ნაცვლად ინახება Firebase Storage-ის URL
+                };
+
+                db.ref('files').push(newFile, (dbError) => {
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = 'ატვირთვა';
+                    if (dbError) {
+                        showToast('ატვირთვის შეცდომა ბაზაში', 'error');
+                    } else {
+                        closeUploadModal();
+                        showToast('ფაილი წარმატებით აიტვირთა!', 'success');
+                    }
+                });
+            });
+        }
+    );
+}
 
     async function renderPdfThumbnail(dataUrl, containerElement) {
         try {
@@ -1928,66 +2040,6 @@ table.excel-rendered {
                 box.innerHTML = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#4b5563">${icons.file}</div><span>ფაილი</span></div>`;
             }
         });
-    }
-
-    function uploadFile() {
-        const titleInput = document.getElementById('fileTitle');
-        const locationInput = document.getElementById('fileLocation');
-        const fileInput = document.getElementById('fileInput');
-
-        if (!titleInput.value || !fileInput.files[0]) {
-            showToast('გთხოვთ მიუთითოთ სათაური და აირჩიოთ ფაილი!', 'error');
-            return;
-        }
-
-        const file = fileInput.files[0];
-        if (!validateFileFormat(file)) {
-            showToast('მხოლოდ გახსნადი ფორმატის ფაილებია დაშვებული!', 'error');
-            return;
-        }
-
-        const uploadBtn = document.getElementById('uploadBtn');
-        uploadBtn.disabled = true;
-        uploadBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; border-top-color: white;"></div> მიმდინარეობს ატვირთვა...';
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            let fileType = file.type;
-            const fileName = file.name.toLowerCase();
-
-            if (fileName.endsWith('.pdf')) {
-                fileType = 'application/pdf';
-            } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || fileName.endsWith('.csv')) {
-                fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-            } else if (fileName.endsWith('.docx')) {
-                fileType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-            } else if (fileName.match(/\.(jpg|jpeg|webp)$/)) {
-                fileType = 'image/jpeg';
-            } else if (fileName.endsWith('.png')) {
-                fileType = 'image/png';
-            }
-
-            const newFile = {
-                title: titleInput.value,
-                location: locationInput.value.trim() || '-',
-                name: file.name,
-                type: fileType,
-                dataUrl: e.target.result
-            };
-
-            db.ref('files').push(newFile, (error) => {
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = 'ატვირთვა';
-                if (error) {
-                    showToast('ატვირთვის შეცდომა ბაზაში', 'error');
-                } else {
-                    closeUploadModal();
-                    showToast('ფაილი წარმატებით აიტვირთა!', 'success');
-                }
-            });
-        };
-
-        reader.readAsDataURL(file);
     }
 
     function getExcelColumnName(n) {
