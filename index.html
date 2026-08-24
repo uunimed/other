@@ -992,17 +992,35 @@ table.excel-rendered {
 
     <div id="toastContainer"></div>
 
-    <!-- ავტორიზაციის გვერდი -->
-    <div id="loginView" class="login-wrapper">
-        <div class="login-card">
-            <h2>ShogiDocuments</h2>
-            <p>გაიარეთ ავტორიზაცია</p>
+<div id="loginView" class="login-wrapper">
+    <div class="login-card" style="text-align: center;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 24px;">
+            <!-- ფაილის სიმბოლო -->
+            <div style="width: 52px; height: 52px; background: #e0e7ff; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                <svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: var(--primary);">
+                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                </svg>
+            </div>
+            
+            <!-- ურთიერთსაპირისპირო ისარი (ორმხრივი) -->
+            <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: var(--text-muted);">
+                <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/>
+            </svg>
+
+            <!-- პიროვნების სიმბოლო -->
+            <div style="width: 52px; height: 52px; background: #f1f5f9; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                <svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: var(--primary);">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </div>
+        </div>
+        <h2>ShogiDocuments</h2>
             <div class="form-group">
-                <label for="usernameInput">მომხმარებელი</label>
+                <label for="usernameInput"></label>
                 <input type="text" id="usernameInput" placeholder="შეიყვანეთ სახელი">
             </div>
             <div class="form-group">
-                <label for="passwordInput">პაროლი</label>
+                <label for="passwordInput"></label>
                 <input type="password" id="passwordInput" placeholder="შეიყვანეთ პაროლი">
             </div>
             <button class="btn" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="handleLogin()">შესვლა</button>
