@@ -29,7 +29,7 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -237,14 +237,14 @@
 
         .search-box-wrapper svg {
             position: absolute;
-            left: 16px; /* გამადიდებელი ახლოსაა მარცხენა კიდესთან */
+            left: 16px;
             width: 18px;
             height: 18px;
             fill: var(--text-muted);
             pointer-events: none;
         }
 
-.search-input {
+        .search-input {
             border: 1px solid var(--border);
             border-radius: 10px;
             font-size: 14px;
@@ -257,9 +257,8 @@
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
 
-        /* მთავარი ჰედერის ძებნის ველი (ლუპით) */
         .header-search-input {
-            padding: 10px 16px 10px 35px !important; /* ზუსტად 1.5 სმ (56px) მარცხნიდან */
+            padding: 10px 16px 10px 35px !important;
             width: 280px;
         }
 
@@ -357,7 +356,6 @@
             background: #f8fafc;
         }
 
-        /* კასტუმური Dropdown-ის დიზაინი */
         .custom-dropdown-container {
             position: absolute;
             top: 100%;
@@ -900,7 +898,6 @@
             box-shadow: 0 4px 18px rgba(15, 23, 42, 0.12);
         }
 
-        /* Excel ცხრილის პროფესიონალური ბადის და სვეტების/რიგების დიზაინი */
         .excel-table-container {
             width: 100%;
             height: 100%;
@@ -911,7 +908,7 @@
             position: relative;
         }
 
-table.excel-rendered {
+        table.excel-rendered {
             width: max-content;
             min-width: 100%;
             border-collapse: separate !important;
@@ -934,12 +931,10 @@ table.excel-rendered {
         }
 
         table.excel-rendered th:first-child,
-        table.excel-rendered td:first-child {
+        .excel-rendered td:first-child {
             border-left-width: 1px !important;
         }
-        
 
-        /* 1. ზედა სვეტების სათაურები (A, B, C...) ფიქსირდება ზემოთ */
         table.excel-rendered th {
             background-color: #f1f5f9 !important;
             font-weight: 600;
@@ -951,7 +946,6 @@ table.excel-rendered {
             background-clip: padding-box;
         }
 
-        /* 2. მარცხენა რიგების ნომრები (1, 2, 3...) ფიქსირდება მარცხნივ */
         table.excel-rendered td.excel-row-header {
             background-color: #f1f5f9 !important;
             color: #64748b;
@@ -965,7 +959,6 @@ table.excel-rendered {
             background-clip: padding-box;
         }
 
-        /* 3. ზედა-მარცხენა კუთხის უჯრა ფიქსირდება ორივე მიმართულებით */
         table.excel-rendered th.excel-corner-cell {
             background-color: #e2e8f0 !important;
             width: 50px;
@@ -973,7 +966,7 @@ table.excel-rendered {
             position: sticky;
             left: 0;
             top: 0;
-            z-index: 40; /* უფრო მაღალი ზ-ინდექსი, რომ სხვებზე ზემოდან იყოს */
+            z-index: 40;
         }
 
         .empty-state {
@@ -992,32 +985,29 @@ table.excel-rendered {
 
     <div id="toastContainer"></div>
 
-<div id="loginView" class="login-wrapper">
-    <div class="login-card" style="text-align: center;">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 24px;">
-            <!-- ფაილის სიმბოლო -->
-            <div style="width: 52px; height: 52px; background: #e0e7ff; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
-                <svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: var(--primary);">
-                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+    <div id="loginView" class="login-wrapper">
+        <div class="login-card" style="text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 24px;">
+                <div style="width: 52px; height: 52px; background: #e0e7ff; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                    <svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: var(--primary);">
+                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                    </svg>
+                </div>
+                
+                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: var(--text-muted);">
+                    <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/>
                 </svg>
-            </div>
-            
-            <!-- ურთიერთსაპირისპირო ისარი (ორმხრივი) -->
-            <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: var(--text-muted);">
-                <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/>
-            </svg>
 
-            <!-- პიროვნების სიმბოლო -->
-            <div style="width: 52px; height: 52px; background: #f1f5f9; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
-                <svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: var(--primary);">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
+                <div style="width: 52px; height: 52px; background: #f1f5f9; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                    <svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: var(--primary);">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
             </div>
-        </div>
-        <h2>ShogiDocuments</h2>
+            <h2>ShogiDocuments</h2>
             <div class="form-group">
                 <label for="usernameInput"></label>
-                <input type="text" id="usernameInput" placeholder="შეიყვანეთ სახელი">
+                <input type="text" id="usernameInput" placeholder="შეიყვანეთ სახელი და გვარი (ან მომხმარებელი)">
             </div>
             <div class="form-group">
                 <label for="passwordInput"></label>
@@ -1039,7 +1029,7 @@ table.excel-rendered {
             <div class="header-actions">
                 <div class="search-box-wrapper">
                     <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-<input type="text" id="searchInput" class="search-input header-search-input" placeholder="ძებნა..." oninput="handleSearch(event)">
+                    <input type="text" id="searchInput" class="search-input header-search-input" placeholder="ძებნა..." oninput="handleSearch(event)">
                 </div>
                 <button class="btn" onclick="openUploadModal()">
                     <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
@@ -1059,7 +1049,7 @@ table.excel-rendered {
         </div>
     </div>
 
-<!-- ატვირთვის Modal -->
+    <!-- ატვირთვის Modal -->
     <div class="modal" id="uploadModal">
         <div class="modal-content upload-modal">
             <div class="modal-header">
@@ -1092,7 +1082,6 @@ table.excel-rendered {
                     </div>
                 </div>
 
-                <!-- ატვირთვის პროგრეს ბარი -->
                 <div id="uploadProgressContainer" class="form-group hidden" style="margin-top: 15px;">
                     <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; font-weight: 600; color: var(--text);">
                         <span>ატვირთვის პროცესი:</span>
@@ -1174,6 +1163,27 @@ table.excel-rendered {
         </div>
     </div>
 
+    <!-- ახალი მოწყობილობიდან შესვლის დადასტურების მოთხოვნის Modal (მთავარი მოწყობილობისთვის) -->
+    <div class="modal" id="accessRequestModal">
+        <div class="modal-content confirm-modal" style="max-width: 440px;">
+            <div style="width: 50px; height: 50px; background: #e0e7ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto;">
+                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: var(--primary);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            </div>
+            <h3 style="font-size: 18px; color: var(--text); margin-bottom: 8px;">შესვლის მოთხოვნა სხვა მოწყობილობიდან</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
+                ახალმა მოწყობილობამ მოითხოვა სისტემაში შესვლა:
+            </p>
+            <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; text-align: left; font-size: 13px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 6px;">
+                <div><strong>სახელი და გვარი:</strong> <span id="reqUsername">-</span></div>
+                <div><strong>IP მისამართი:</strong> <span id="reqIp">-</span></div>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn btn-danger" onclick="rejectAccessRequest()" style="flex: 1; justify-content: center;">უარყოფა</button>
+                <button class="btn" onclick="approveAccessRequest()" style="flex: 1; justify-content: center; background: #10b981;">თანხმობა</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     const firebaseConfig = {
         apiKey: "AIzaSyATvDjEFcDxjOiT3dEs9u5fmGQT5eIC7ao",
@@ -1214,6 +1224,28 @@ table.excel-rendered {
     let activePdfRenderingPages = new Map();
     let activePdfRenderVersion = 0;
 
+    let currentRequestIdModal = null;
+    let activeLoginRequestId = null;
+
+    function getDeviceId() {
+        let id = localStorage.getItem('shogi_device_id');
+        if (!id) {
+            id = 'dev_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+            localStorage.setItem('shogi_device_id', id);
+        }
+        return id;
+    }
+
+    async function getClientIP() {
+        try {
+            const res = await fetch('https://api.ipify.org?format=json');
+            const data = await res.json();
+            return data.ip;
+        } catch (e) {
+            return 'უცნობი IP';
+        }
+    }
+
     function getFileNameLower(file) {
         return (file?.name || '').toLowerCase();
     }
@@ -1248,19 +1280,6 @@ table.excel-rendered {
             byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
         return new Uint8Array(byteNumbers);
-    }
-
-    function dataUrlToBlob(dataUrl, fallbackType = 'application/octet-stream') {
-        const mimeMatch = dataUrl.match(/^data:([^;,]+)/);
-        const mimeType = mimeMatch ? mimeMatch[1] : fallbackType;
-        return new Blob([dataUrlToUint8Array(dataUrl)], { type: mimeType || fallbackType });
-    }
-
-    function releasePdfObjectUrl() {
-        if (currentPdfObjectUrl) {
-            URL.revokeObjectURL(currentPdfObjectUrl);
-            currentPdfObjectUrl = null;
-        }
     }
 
     function escapeHtml(value) {
@@ -1628,21 +1647,170 @@ table.excel-rendered {
         initFirebaseSync();
     }
 
-    function handleLogin() {
+    async function handleLogin() {
         const user = document.getElementById('usernameInput').value.trim();
         const pass = document.getElementById('passwordInput').value.trim();
 
         if (user === 'alex' && pass === '2911') {
-            localStorage.setItem('isLoggedIn', 'true');
-            showToast('წარმატებით შეხვედით სისტემაში!', 'success');
-            showApp();
+            const deviceId = getDeviceId();
+            const isMasterDevice = localStorage.getItem('shogi_is_master') === 'true';
+
+            // თუ ეს უკვე დადასტურებული მთავარი მოწყობილობაა, მაშინვე უშვებს
+            if (isMasterDevice) {
+                localStorage.setItem('isLoggedIn', 'true');
+                showToast('წარმატებით შეხვედით სისტემაში!', 'success');
+                showApp();
+                return;
+            }
+
+            // სხვა მოწყობილობიდან შესვლისას ვქმნით მოთხოვნას ბაზაში
+            showToast('მიმდინარეობს ნებართვის მოთხოვნა...', 'success');
+            const ip = await getClientIP();
+            const requestId = 'req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+            activeLoginRequestId = requestId;
+
+            showWaitingScreen(requestId, user);
+
+            db.ref('login_requests/' + requestId).set({
+                deviceId: deviceId,
+                username: user,
+                ip: ip,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                status: 'pending'
+            });
+
+            // ვუსმენთ ამ კონკრეტული მოთხოვნის სტატუსს
+            db.ref('login_requests/' + requestId).on('value', (snapshot) => {
+                const val = snapshot.val();
+                if (!val) return;
+                if (val.status === 'approved') {
+                    db.ref('login_requests/' + requestId).off();
+                    db.ref('login_requests/' + requestId).remove();
+                    localStorage.setItem('shogi_is_master', 'true');
+                    localStorage.setItem('isLoggedIn', 'true');
+                    hideWaitingScreen();
+                    showToast('ნებართვა გაცემულია! წარმატებით შეხვედით.', 'success');
+                    showApp();
+                } else if (val.status === 'rejected') {
+                    db.ref('login_requests/' + requestId).off();
+                    db.ref('login_requests/' + requestId).remove();
+                    hideWaitingScreen();
+                    showToast('შესვლის მოთხოვნა უარყოფილია მთავარი მოწყობილობის მიერ.', 'error');
+                }
+            });
+
         } else {
             showToast('არასწორი მომხმარებელი ან პაროლი!', 'error');
         }
     }
 
+    function showWaitingScreen(requestId, username) {
+        const card = document.querySelector('.login-card');
+        card.dataset.originalHtml = card.innerHTML;
+        card.innerHTML = `
+            <div class="spinner-container" style="padding: 20px 0;">
+                <div class="spinner"></div>
+                <h3 style="margin-top: 15px; font-size: 18px; color: var(--text);">ნებართვის მოლოდინში...</h3>
+                <p style="color: var(--text-muted); font-size: 13px; margin-top: 8px;">გთხოვთ, დაადასტუროთ შესვლა მთავარი მოწყობილობიდან.</p>
+                <button class="btn btn-outline" style="margin-top: 25px; width: 100%; justify-content: center;" onclick="cancelLoginRequest('${requestId}')">გაუქმება</button>
+            </div>
+        `;
+    }
+
+    function cancelLoginRequest(requestId) {
+        if (requestId) {
+            db.ref('login_requests/' + requestId).remove();
+        }
+        hideWaitingScreen();
+        showToast('შესვლის მოთხოვნა გაუქმდა', 'success');
+    }
+
+    function hideWaitingScreen() {
+        const card = document.querySelector('.login-card');
+        if (card && card.dataset.originalHtml) {
+            card.innerHTML = card.dataset.originalHtml;
+        }
+        activeLoginRequestId = null;
+    }
+
+    function initAdminApprovalListener() {
+        // ვუსმენთ login_requests განყოფილებას, რომ მთავარმა მოწყობილობამ დაინახოს სხვისი შემოსვლის მცდელობა
+        db.ref('login_requests').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
+                closeAccessModal();
+                return;
+            }
+
+            let pendingKey = null;
+            let pendingData = null;
+
+            Object.keys(data).forEach(key => {
+                if (data[key].status === 'pending') {
+                    // არ ვუჩვენოთ საკუთარი თავის მოთხოვნა, თუ ამავე მოწყობილობიდან ითხოვს
+                    const myDeviceId = getDeviceId();
+                    if (data[key].deviceId !== myDeviceId) {
+                        pendingKey = key;
+                        pendingData = data[key];
+                    }
+                }
+            });
+
+            if (pendingKey && pendingData) {
+                currentRequestIdModal = pendingKey;
+                showAccessRequestModal(pendingData);
+            } else {
+                closeAccessModal();
+            }
+        });
+    }
+
+    function showAccessRequestModal(reqData) {
+        document.getElementById('reqUsername').textContent = reqData.username;
+        document.getElementById('reqIp').textContent = reqData.ip;
+        document.getElementById('accessRequestModal').style.display = 'flex';
+    }
+
+    function closeAccessModal() {
+        const modal = document.getElementById('accessRequestModal');
+        if (modal) modal.style.display = 'none';
+        currentRequestIdModal = null;
+    }
+
+    function approveAccessRequest() {
+        if (!currentRequestIdModal) return;
+        db.ref('login_requests/' + currentRequestIdModal).update({
+            status: 'approved'
+        }, (error) => {
+            if (!error) {
+                showToast('შესვლის მოთხოვნა დამტკიცდა', 'success');
+                closeAccessModal();
+            } else {
+                showToast('შეცდომა ოპერაციისას', 'error');
+            }
+        });
+    }
+
+    function rejectAccessRequest() {
+        if (!currentRequestIdModal) return;
+        db.ref('login_requests/' + currentRequestIdModal).update({
+            status: 'rejected'
+        }, (error) => {
+            if (!error) {
+                showToast('შესვლის მოთხოვნა უარყოფილია', 'success');
+                closeAccessModal();
+            } else {
+                showToast('შეცდომა ოპერაციისას', 'error');
+            }
+        });
+    }
+
     function handleLogout() {
         localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('shogi_is_master');
+        if (activeLoginRequestId) {
+            db.ref('login_requests/' + activeLoginRequestId).remove();
+        }
         showToast('წარმატებით გახვედით სისტემიდან', 'success');
         showLogin();
     }
@@ -1656,6 +1824,7 @@ table.excel-rendered {
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('appView').classList.remove('hidden');
         initFirebaseSync();
+        initAdminApprovalListener();
     }
 
     function initFirebaseSync() {
@@ -1732,116 +1901,115 @@ table.excel-rendered {
     }
 
     function closeUploadModal() {
-    document.getElementById('uploadModal').style.display = 'none';
-    document.getElementById('fileTitle').value = '';
-    document.getElementById('fileLocation').value = '';
-    document.getElementById('fileInput').value = '';
-    document.getElementById('uploadPreview').innerHTML = '<span class="preview-placeholder">ფაილი არ არის არჩეული</span>';
-    
-    // პროგრეს ბარის გასუფთავება/დამალვა
-    const progressContainer = document.getElementById('uploadProgressContainer');
-    const progressBar = document.getElementById('uploadProgressBar');
-    const progressPercent = document.getElementById('uploadPercent');
-    if (progressContainer) progressContainer.classList.add('hidden');
-    if (progressBar) progressBar.style.width = '0%';
-    if (progressPercent) progressPercent.textContent = '0%';
+        document.getElementById('uploadModal').style.display = 'none';
+        document.getElementById('fileTitle').value = '';
+        document.getElementById('fileLocation').value = '';
+        document.getElementById('fileInput').value = '';
+        document.getElementById('uploadPreview').innerHTML = '<span class="preview-placeholder">ფაილი არ არის არჩეული</span>';
+        
+        const progressContainer = document.getElementById('uploadProgressContainer');
+        const progressBar = document.getElementById('uploadProgressBar');
+        const progressPercent = document.getElementById('uploadPercent');
+        if (progressContainer) progressContainer.classList.add('hidden');
+        if (progressBar) progressBar.style.width = '0%';
+        if (progressPercent) progressPercent.textContent = '0%';
 
-    const dropdown = document.getElementById('customCategoryDropdown');
-    if (dropdown) dropdown.style.display = 'none';
-}
-
-function uploadFile() {
-    const titleInput = document.getElementById('fileTitle');
-    const locationInput = document.getElementById('fileLocation');
-    const fileInput = document.getElementById('fileInput');
-
-    if (!titleInput.value || !fileInput.files[0]) {
-        showToast('გთხოვთ მიუთითოთ სათაური და აირჩიოთ ფაილი!', 'error');
-        return;
+        const dropdown = document.getElementById('customCategoryDropdown');
+        if (dropdown) dropdown.style.display = 'none';
     }
 
-    const file = fileInput.files[0];
-    if (!validateFileFormat(file)) {
-        showToast('მხოლოდ გახსნადი ფორმატის ფაილებია დაშვებული!', 'error');
-        return;
-    }
+    function uploadFile() {
+        const titleInput = document.getElementById('fileTitle');
+        const locationInput = document.getElementById('fileLocation');
+        const fileInput = document.getElementById('fileInput');
 
-    const uploadBtn = document.getElementById('uploadBtn');
-    const progressContainer = document.getElementById('uploadProgressContainer');
-    const progressBar = document.getElementById('uploadProgressBar');
-    const progressPercent = document.getElementById('uploadPercent');
-
-    uploadBtn.disabled = true;
-    uploadBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; border-top-color: white;"></div> მიმდინარეობს დამუშავება...';
-    
-    progressContainer.classList.remove('hidden');
-    progressBar.style.width = '10%';
-    progressPercent.textContent = '10%';
-
-    const reader = new FileReader();
-
-    reader.onprogress = function(event) {
-        if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 80);
-            progressBar.style.width = percent + '%';
-            progressPercent.textContent = percent + '%';
-        }
-    };
-
-    reader.onload = function(e) {
-        progressBar.style.width = '90%';
-        progressPercent.textContent = '90%';
-
-        const dataUrl = e.target.result;
-        let fileType = file.type;
-        const fileName = file.name.toLowerCase();
-
-        if (fileName.endsWith('.pdf')) {
-            fileType = 'application/pdf';
-        } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || fileName.endsWith('.csv')) {
-            fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-        } else if (fileName.endsWith('.docx')) {
-            fileType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-        } else if (fileName.match(/\.(jpg|jpeg|webp)$/)) {
-            fileType = 'image/jpeg';
-        } else if (fileName.endsWith('.png')) {
-            fileType = 'image/png';
+        if (!titleInput.value || !fileInput.files[0]) {
+            showToast('გთხოვთ მიუთითოთ სათაური და აირჩიოთ ფაილი!', 'error');
+            return;
         }
 
-        const newFile = {
-            title: titleInput.value,
-            location: locationInput.value.trim() || '-',
-            name: file.name,
-            type: fileType,
-            dataUrl: dataUrl
+        const file = fileInput.files[0];
+        if (!validateFileFormat(file)) {
+            showToast('მხოლოდ გახსნადი ფორმატის ფაილებია დაშვებული!', 'error');
+            return;
+        }
+
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progressContainer = document.getElementById('uploadProgressContainer');
+        const progressBar = document.getElementById('uploadProgressBar');
+        const progressPercent = document.getElementById('uploadPercent');
+
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; border-top-color: white;"></div> მიმდინარეობს დამუშავება...';
+        
+        progressContainer.classList.remove('hidden');
+        progressBar.style.width = '10%';
+        progressPercent.textContent = '10%';
+
+        const reader = new FileReader();
+
+        reader.onprogress = function(event) {
+            if (event.lengthComputable) {
+                const percent = Math.round((event.loaded / event.total) * 80);
+                progressBar.style.width = percent + '%';
+                progressPercent.textContent = percent + '%';
+            }
         };
 
-        db.ref('files').push(newFile, (dbError) => {
+        reader.onload = function(e) {
+            progressBar.style.width = '90%';
+            progressPercent.textContent = '90%';
+
+            const dataUrl = e.target.result;
+            let fileType = file.type;
+            const fileName = file.name.toLowerCase();
+
+            if (fileName.endsWith('.pdf')) {
+                fileType = 'application/pdf';
+            } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || fileName.endsWith('.csv')) {
+                fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            } else if (fileName.endsWith('.docx')) {
+                fileType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+            } else if (fileName.match(/\.(jpg|jpeg|webp)$/)) {
+                fileType = 'image/jpeg';
+            } else if (fileName.endsWith('.png')) {
+                fileType = 'image/png';
+            }
+
+            const newFile = {
+                title: titleInput.value,
+                location: locationInput.value.trim() || '-',
+                name: file.name,
+                type: fileType,
+                dataUrl: dataUrl
+            };
+
+            db.ref('files').push(newFile, (dbError) => {
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = 'ატვირთვა';
+                if (dbError) {
+                    showToast('ბაზაში შენახვის შეცდომა', 'error');
+                } else {
+                    progressBar.style.width = '100%';
+                    progressPercent.textContent = '100%';
+                    setTimeout(() => {
+                        closeUploadModal();
+                        showToast('ფაილი წარმატებით აიტვირთა!', 'success');
+                    }, 300);
+                }
+            });
+        };
+
+        reader.onerror = function() {
             uploadBtn.disabled = false;
             uploadBtn.innerHTML = 'ატვირთვა';
-            if (dbError) {
-                console.error("Database Save Error:", dbError);
-                showToast('ბაზაში შენახვის შეცდომა', 'error');
-            } else {
-                progressBar.style.width = '100%';
-                progressPercent.textContent = '100%';
-                setTimeout(() => {
-                    closeUploadModal();
-                    showToast('ფაილი წარმატებით აიტვირთა!', 'success');
-                }, 300);
-            }
-        });
-    };
+            progressContainer.classList.add('hidden');
+            showToast('ფაილის წაკითხვის შეცდომა', 'error');
+        };
 
-    reader.onerror = function() {
-        uploadBtn.disabled = false;
-        uploadBtn.innerHTML = 'ატვირთვა';
-        progressContainer.classList.add('hidden');
-        showToast('ფაილის წაკითხვის შეცდომა', 'error');
-    };
+        reader.readAsDataURL(file);
+    }
 
-    reader.readAsDataURL(file);
-}
     async function renderPdfThumbnail(dataUrl, containerElement) {
         try {
             const base64Data = dataUrl.split(',')[1];
