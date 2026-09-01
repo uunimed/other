@@ -979,6 +979,85 @@
         .hidden {
             display: none !important;
         }
+        
+        /* -------------------------------------
+           მობილური ვერსიის ოპტიმიზაცია (Mobile Media Queries)
+           ------------------------------------- */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 15px 20px;
+                gap: 15px;
+            }
+            .header-actions {
+                display: flex;
+                flex-wrap: wrap;
+                width: 100%;
+                gap: 10px;
+            }
+            .search-box-wrapper {
+                flex: 1 1 100%;
+                width: 100%;
+            }
+            .header-search-input {
+                width: 100% !important;
+            }
+            .header-actions > .btn {
+                flex: 1;
+                justify-content: center;
+            }
+            .app-body-content {
+                padding: 0 15px 30px 15px;
+            }
+            .file-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+            .file-card-preview {
+                height: 110px;
+            }
+            .file-card-footer {
+                padding: 10px;
+                gap: 8px;
+            }
+            .file-icon-box {
+                width: 30px;
+                height: 30px;
+            }
+            .file-icon-box svg {
+                width: 16px;
+                height: 16px;
+            }
+            .file-title {
+                font-size: 13px;
+            }
+            .file-type-label {
+                font-size: 10px;
+            }
+            .modal {
+                padding: 0;
+            }
+            .modal-content.file-view-modal,
+            .modal-content.upload-modal {
+                width: 100vw !important;
+                height: 100vh !important;
+                max-width: 100%;
+                max-height: 100%;
+                border-radius: 0;
+            }
+            .modal-header {
+                padding: 15px;
+            }
+            .modal-body {
+                padding: 15px;
+            }
+            .modal-footer-toolbar {
+                flex-wrap: wrap;
+                gap: 10px;
+                padding: 12px 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -993,7 +1072,7 @@
                         <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
                     </svg>
                 </div>
-                
+
                 <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: var(--text-muted);">
                     <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/>
                 </svg>
@@ -1227,6 +1306,14 @@
     let currentRequestIdModal = null;
     let activeLoginRequestId = null;
 
+    // -- აქ დაემატა ერორის გამომწვევი ფუნქცია --
+    function releasePdfObjectUrl() {
+        if (currentPdfObjectUrl) {
+            URL.revokeObjectURL(currentPdfObjectUrl);
+            currentPdfObjectUrl = null;
+        }
+    }
+
     function getDeviceId() {
         let id = localStorage.getItem('shogi_device_id');
         if (!id) {
@@ -1418,7 +1505,7 @@
         });
     }
 
-    async function renderPdfPage(pageNumber) {
+ async function renderPdfPage(pageNumber) {
         if (!activePdfDoc) return;
         if (activePdfRenderedPages.has(pageNumber)) return;
         if (activePdfRenderingPages.has(pageNumber)) return activePdfRenderingPages.get(pageNumber);
@@ -1437,6 +1524,10 @@
             pageShell.style.width = `${viewport.width}px`;
             pageShell.style.height = `${viewport.height}px`;
             pageShell.style.aspectRatio = 'auto';
+            
+            // დამატებული ხაზი ერორის გამოსასწორებლად
+            pageShell.style.setProperty('--scale-factor', viewport.scale);
+
             pageShell.innerHTML = '<canvas></canvas><div class="pdf-text-layer"></div>';
 
             const canvas = pageShell.querySelector('canvas');
@@ -1473,7 +1564,8 @@
             }
 
             activePdfRenderedPages.add(pageNumber);
-        })().catch(() => {
+        })().catch((err) => {
+            console.error(err);
             const pageShell = getPdfPageShell(pageNumber);
             if (pageShell) pageShell.innerHTML = '<div class="pdf-page-loading" style="color:#ef4444;">გვერდის ჩატვირთვა ვერ მოხერხდა</div>';
         }).finally(() => {
@@ -1655,7 +1747,6 @@
             const deviceId = getDeviceId();
             const isMasterDevice = localStorage.getItem('shogi_is_master') === 'true';
 
-            // თუ ეს უკვე დადასტურებული მთავარი მოწყობილობაა, მაშინვე უშვებს
             if (isMasterDevice) {
                 localStorage.setItem('isLoggedIn', 'true');
                 showToast('წარმატებით შეხვედით სისტემაში!', 'success');
@@ -1663,7 +1754,6 @@
                 return;
             }
 
-            // სხვა მოწყობილობიდან შესვლისას ვქმნით მოთხოვნას ბაზაში
             showToast('მიმდინარეობს ნებართვის მოთხოვნა...', 'success');
             const ip = await getClientIP();
             const requestId = 'req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
@@ -1679,7 +1769,6 @@
                 status: 'pending'
             });
 
-            // ვუსმენთ ამ კონკრეტული მოთხოვნის სტატუსს
             db.ref('login_requests/' + requestId).on('value', (snapshot) => {
                 const val = snapshot.val();
                 if (!val) return;
@@ -1734,7 +1823,6 @@
     }
 
     function initAdminApprovalListener() {
-        // ვუსმენთ login_requests განყოფილებას, რომ მთავარმა მოწყობილობამ დაინახოს სხვისი შემოსვლის მცდელობა
         db.ref('login_requests').on('value', (snapshot) => {
             const data = snapshot.val();
             if (!data) {
@@ -1747,7 +1835,6 @@
 
             Object.keys(data).forEach(key => {
                 if (data[key].status === 'pending') {
-                    // არ ვუჩვენოთ საკუთარი თავის მოთხოვნა, თუ ამავე მოწყობილობიდან ითხოვს
                     const myDeviceId = getDeviceId();
                     if (data[key].deviceId !== myDeviceId) {
                         pendingKey = key;
@@ -1835,6 +1922,9 @@
                 Object.keys(data).forEach(key => {
                     filesData.push({ id: key, ...data[key] });
                 });
+                
+                // -- დამატებულია შემოტრიალება: უახლესი ფაილები დადგება პირველ ადგილას --
+                filesData.reverse(); 
             }
             renderFiles();
         }, (error) => {
@@ -1906,7 +1996,7 @@
         document.getElementById('fileLocation').value = '';
         document.getElementById('fileInput').value = '';
         document.getElementById('uploadPreview').innerHTML = '<span class="preview-placeholder">ფაილი არ არის არჩეული</span>';
-        
+
         const progressContainer = document.getElementById('uploadProgressContainer');
         const progressBar = document.getElementById('uploadProgressBar');
         const progressPercent = document.getElementById('uploadPercent');
@@ -1941,7 +2031,7 @@
 
         uploadBtn.disabled = true;
         uploadBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; border-top-color: white;"></div> მიმდინარეობს დამუშავება...';
-        
+
         progressContainer.classList.remove('hidden');
         progressBar.style.width = '10%';
         progressPercent.textContent = '10%';
@@ -2128,14 +2218,17 @@
             return;
         }
 
-        const grouped = filteredFiles.reduce((acc, file) => {
+        // Map გამოყენება უზრუნველყოფს კატეგორიების დალაგებას დამატების თანმიმდევრობით
+        const grouped = new Map();
+        filteredFiles.forEach((file) => {
             const loc = file.location || '-';
-            if (!acc[loc]) acc[loc] = [];
-            acc[loc].push(file);
-            return acc;
-        }, {});
+            if (!grouped.has(loc)) {
+                grouped.set(loc, []);
+            }
+            grouped.get(loc).push(file);
+        });
 
-        for (const [location, files] of Object.entries(grouped)) {
+        for (const [location, files] of grouped.entries()) {
             let sectionHTML = `
                 <div class="location-section">
                     <div class="location-header">
@@ -2227,7 +2320,7 @@
         activeExcelWorkbook = null;
         activeExcelSheetName = '';
         cleanupPdfViewer();
-        releasePdfObjectUrl();
+        releasePdfObjectUrl(); // ფუნქცია, რომელიც ადრე აკლდა კოდს
         closeDownloadOptions();
         hidePageJump();
 
