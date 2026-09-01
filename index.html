@@ -395,6 +395,7 @@
             border-bottom: 2px solid var(--border);
             padding-bottom: 10px;
             margin-bottom: 20px;
+            user-select: none;
         }
 
         .location-title {
@@ -413,6 +414,18 @@
             font-weight: 600;
             padding: 3px 10px;
             border-radius: 20px;
+        }
+
+        .mobile-category-arrow {
+            display: none;
+            width: 18px;
+            height: 18px;
+            fill: var(--text-muted);
+            transition: transform 0.25s ease;
+        }
+
+        .mobile-category-arrow.open {
+            transform: rotate(180deg);
         }
 
         .file-grid {
@@ -981,8 +994,8 @@
         }
         
         /* -------------------------------------
-           მობილური ვერსიის ოპტიმიზაცია (Mobile Media Queries)
-           ------------------------------------- */
+            მობილური ვერსიის ოპტიმიზაცია (Mobile Media Queries)
+            ------------------------------------- */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
@@ -1009,6 +1022,12 @@
             }
             .app-body-content {
                 padding: 0 15px 30px 15px;
+            }
+            .mobile-category-arrow {
+                display: block;
+            }
+            .location-header {
+                cursor: pointer;
             }
             .file-grid {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -1306,7 +1325,8 @@
     let currentRequestIdModal = null;
     let activeLoginRequestId = null;
 
-    // -- აქ დაემატა ერორის გამომწვევი ფუნქცია --
+    let mobileOpenCategory = null; // მობილურისთვის ერთდროულად გახსნილი კატეგორია
+
     function releasePdfObjectUrl() {
         if (currentPdfObjectUrl) {
             URL.revokeObjectURL(currentPdfObjectUrl);
@@ -1505,7 +1525,7 @@
         });
     }
 
- async function renderPdfPage(pageNumber) {
+    async function renderPdfPage(pageNumber) {
         if (!activePdfDoc) return;
         if (activePdfRenderedPages.has(pageNumber)) return;
         if (activePdfRenderingPages.has(pageNumber)) return activePdfRenderingPages.get(pageNumber);
@@ -1524,8 +1544,6 @@
             pageShell.style.width = `${viewport.width}px`;
             pageShell.style.height = `${viewport.height}px`;
             pageShell.style.aspectRatio = 'auto';
-            
-            // დამატებული ხაზი ერორის გამოსასწორებლად
             pageShell.style.setProperty('--scale-factor', viewport.scale);
 
             pageShell.innerHTML = '<canvas></canvas><div class="pdf-text-layer"></div>';
@@ -1923,7 +1941,6 @@
                     filesData.push({ id: key, ...data[key] });
                 });
                 
-                // -- დამატებულია შემოტრიალება: უახლესი ფაილები დადგება პირველ ადგილას --
                 filesData.reverse(); 
             }
             renderFiles();
@@ -1983,6 +2000,18 @@
 
     function handleSearch(event) {
         searchQuery = event.target.value.toLowerCase().trim();
+        renderFiles();
+    }
+
+    function handleCategoryClick(location) {
+        if (window.innerWidth > 768) return; // კომპიუტერზე კატეგორიები მუდამ გახსნილია
+        if (searchQuery.trim() !== '') return; // ძებნის დროს კლიკით მდგომარეობა არ იცვლება
+
+        if (mobileOpenCategory === location) {
+            mobileOpenCategory = null; // დახურვა
+        } else {
+            mobileOpenCategory = location; // გახსნა (სხვები ავტომატურად იხურება, რადგან ერთდროულად მხოლოდ 1 შეიძლება იყოს)
+        }
         renderFiles();
     }
 
@@ -2207,6 +2236,9 @@
         const container = document.getElementById('locationsContainer');
         container.innerHTML = '';
 
+        const isMobile = window.innerWidth <= 768;
+        const isSearching = searchQuery.trim() !== '';
+
         const filteredFiles = filesData.filter(file => {
             const titleMatch = file.title && file.title.toLowerCase().includes(searchQuery);
             const locMatch = file.location && file.location.toLowerCase().includes(searchQuery);
@@ -2218,7 +2250,6 @@
             return;
         }
 
-        // Map გამოყენება უზრუნველყოფს კატეგორიების დალაგებას დამატების თანმიმდევრობით
         const grouped = new Map();
         filteredFiles.forEach((file) => {
             const loc = file.location || '-';
@@ -2229,13 +2260,26 @@
         });
 
         for (const [location, files] of grouped.entries()) {
+            // მობილურზე თუ ძებნა მიმდინარეობს, ვხსნით ყველა იმ კატეგორიას, სადაც ფაილი მოიძებნა.
+            // წინააღმდეგ შემთხვევაში ვხსნით მხოლოდ მაშინ, თუ mobileOpenCategory ტოლია ამ კატეგორიის.
+            // კომპიუტერზე მუდამ გახსნილია.
+            const isOpenOnMobile = !isMobile || (isSearching ? true : mobileOpenCategory === location);
+            const arrowClass = isOpenOnMobile && isMobile ? 'mobile-category-arrow open' : 'mobile-category-arrow';
+            const gridClass = isOpenOnMobile ? 'file-grid' : 'file-grid hidden';
+
             let sectionHTML = `
                 <div class="location-section">
-                    <div class="location-header">
-                        <div class="location-title"><div style="width:22px;height:22px;display:inline-block;fill:var(--primary);vertical-align:middle;margin-right:4px;">${icons.folder}</div> ${location}</div>
-                        <span class="file-count">${files.length} ფაილი</span>
+                    <div class="location-header" onclick="handleCategoryClick('${escapeHtml(location)}')">
+                        <div class="location-title">
+                            <div style="width:22px;height:22px;display:inline-block;fill:var(--primary);vertical-align:middle;margin-right:4px;">${icons.folder}</div> 
+                            ${location}
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="file-count">${files.length} ფაილი</span>
+                            <svg class="${arrowClass}" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                        </div>
                     </div>
-                    <div class="file-grid">
+                    <div class="${gridClass}">
             `;
 
             files.forEach((file) => {
@@ -2320,7 +2364,7 @@
         activeExcelWorkbook = null;
         activeExcelSheetName = '';
         cleanupPdfViewer();
-        releasePdfObjectUrl(); // ფუნქცია, რომელიც ადრე აკლდა კოდს
+        releasePdfObjectUrl();
         closeDownloadOptions();
         hidePageJump();
 
