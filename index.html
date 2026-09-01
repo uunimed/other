@@ -20,16 +20,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- PDF.js თამბლეხებისთვის (მინიატურების ასაწყობად) -->
+    <!-- PDF.js მინიატურებისა და ძრავისთვის -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -43,7 +41,6 @@
             --radius: 16px;
         }
 
-        /* თანამედროვე და ორიგინალური კასტუმური სქროლვის ხაზები ყველგან */
         ::-webkit-scrollbar {
             width: 7px;
             height: 7px;
@@ -82,7 +79,6 @@
             padding: 0;
         }
 
-        /* ავტორიზაციის გვერდი */
         .login-wrapper {
             display: flex;
             justify-content: center;
@@ -110,14 +106,6 @@
             color: var(--text);
         }
 
-        .login-card p {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-
-        /* Toast შეტყობინებები */
         #toastContainer {
             position: fixed;
             bottom: 30px;
@@ -160,7 +148,6 @@
             to { transform: translateX(120%); opacity: 0; }
         }
 
-        /* Loading Spinner */
         .spinner-container {
             display: flex;
             flex-direction: column;
@@ -293,7 +280,6 @@
             color: var(--text);
             box-shadow: none;
         }
-
         .btn-outline:hover {
             background: #f1f5f9;
             transform: none;
@@ -379,7 +365,6 @@
             cursor: pointer;
             transition: background 0.15s;
         }
-
         .custom-dropdown-item:hover {
             background: #f1f5f9;
         }
@@ -423,7 +408,6 @@
             fill: var(--text-muted);
             transition: transform 0.25s ease;
         }
-
         .mobile-category-arrow.open {
             transform: rotate(180deg);
         }
@@ -445,7 +429,6 @@
             display: flex;
             flex-direction: column;
         }
-
         .file-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 24px -6px rgba(0,0,0,0.08);
@@ -671,7 +654,6 @@
             justify-content: center;
             transition: all 0.2s;
         }
-
         .close-btn:hover {
             background: #e2e8f0;
             color: var(--text);
@@ -687,14 +669,12 @@
             overflow: auto;
             position: relative;
         }
-
         .modal-body.upload-body {
             padding: 30px;
             flex-direction: column;
             align-items: stretch;
             overflow-y: auto;
         }
-
         .modal-body img, .modal-body canvas {
             max-width: 100%;
             height: auto;
@@ -739,11 +719,9 @@
             justify-content: center;
             transition: background 0.2s;
         }
-
         .toolbar-btn:hover {
             background: #e2e8f0;
         }
-
         .toolbar-btn svg {
             width: 16px;
             height: 16px;
@@ -754,7 +732,6 @@
             display: none;
             gap: 8px;
         }
-
         .page-jump-input {
             width: 74px !important;
             height: 32px;
@@ -782,7 +759,6 @@
             display: none;
             z-index: 50;
         }
-
         .download-options-menu.show {
             display: block;
         }
@@ -800,7 +776,6 @@
             cursor: pointer;
             font-family: inherit;
         }
-
         .download-option-btn:hover {
             background: #f1f5f9;
         }
@@ -810,7 +785,6 @@
             padding: 0;
             align-items: stretch;
         }
-
         .modal-body.word-mode {
             align-items: stretch;
         }
@@ -839,7 +813,6 @@
             flex: 0 0 auto;
             margin: 0 auto;
         }
-
         .pdf-page-shell canvas {
             display: block;
             width: 100%;
@@ -852,7 +825,6 @@
             pointer-events: none;
             user-select: none;
         }
-
         .pdf-page-loading {
             position: absolute;
             inset: 0;
@@ -873,7 +845,6 @@
             user-select: text;
             transform-origin: 0 0;
         }
-
         .pdf-text-layer span,
         .pdf-text-layer br {
             color: transparent;
@@ -883,7 +854,6 @@
             transform-origin: 0% 0%;
             user-select: text;
         }
-
         .pdf-text-layer ::selection {
             background: rgba(99, 102, 241, 0.35);
         }
@@ -895,17 +865,14 @@
             justify-content: center;
             padding: 24px 12px;
         }
-
         .word-render-container {
             transform-origin: top center;
             transition: transform 0.2s ease;
         }
-
         .word-render-container .docx-wrapper {
             background: transparent !important;
             padding: 0 !important;
         }
-
         .word-render-container section.docx {
             margin: 0 auto 22px auto !important;
             box-shadow: 0 4px 18px rgba(15, 23, 42, 0.12);
@@ -929,7 +896,6 @@
             font-size: 13px;
             background-color: #ffffff;
         }
-
         table.excel-rendered th, table.excel-rendered td {
             border: 1px solid #cbd5e1 !important;
             border-width: 0 1px 1px 0 !important;
@@ -938,16 +904,13 @@
             background-color: #ffffff;
             white-space: nowrap;
         }
-
         table.excel-rendered thead th {
             border-top-width: 1px !important;
         }
-
         table.excel-rendered th:first-child,
         .excel-rendered td:first-child {
             border-left-width: 1px !important;
         }
-
         table.excel-rendered th {
             background-color: #f1f5f9 !important;
             font-weight: 600;
@@ -958,7 +921,6 @@
             z-index: 30;
             background-clip: padding-box;
         }
-
         table.excel-rendered td.excel-row-header {
             background-color: #f1f5f9 !important;
             color: #64748b;
@@ -971,7 +933,6 @@
             z-index: 25;
             background-clip: padding-box;
         }
-
         table.excel-rendered th.excel-corner-cell {
             background-color: #e2e8f0 !important;
             width: 50px;
@@ -993,9 +954,6 @@
             display: none !important;
         }
         
-        /* -------------------------------------
-            მობილური ვერსიის ოპტიმიზაცია (Mobile Media Queries)
-            ------------------------------------- */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
@@ -1091,11 +1049,9 @@
                         <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
                     </svg>
                 </div>
-
                 <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: var(--text-muted);">
                     <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/>
                 </svg>
-
                 <div style="width: 52px; height: 52px; background: #f1f5f9; border-radius: 14px; display: flex; align-items: center; justify-content: center;">
                     <svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: var(--primary);">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
@@ -1104,11 +1060,9 @@
             </div>
             <h2>ShogiDocuments</h2>
             <div class="form-group">
-                <label for="usernameInput"></label>
                 <input type="text" id="usernameInput" placeholder="შეიყვანეთ სახელი და გვარი">
             </div>
             <div class="form-group">
-                <label for="passwordInput"></label>
                 <input type="password" id="passwordInput" placeholder="შეიყვანეთ პაროლი">
             </div>
             <button class="btn" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="handleLogin()">შესვლა</button>
@@ -1207,8 +1161,7 @@
                     <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
             </div>
-            <div class="modal-body" id="modalBody">
-            </div>
+            <div class="modal-body" id="modalBody"></div>
             <div class="modal-footer-toolbar">
                 <div class="toolbar-group" id="generalPageInfoGroup">
                     <span id="pageInfo">დოკუმენტი</span>
@@ -1261,16 +1214,14 @@
         </div>
     </div>
 
-    <!-- ახალი მოწყობილობიდან შესვლის დადასტურების მოთხოვნის Modal (მთავარი მოწყობილობისთვის) -->
+    <!-- ახალი მოწყობილობიდან შესვლის დადასტურება -->
     <div class="modal" id="accessRequestModal">
         <div class="modal-content confirm-modal" style="max-width: 440px;">
             <div style="width: 50px; height: 50px; background: #e0e7ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto;">
                 <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: var(--primary);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
             </div>
             <h3 style="font-size: 18px; color: var(--text); margin-bottom: 8px;">შესვლის მოთხოვნა სხვა მოწყობილობიდან</h3>
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
-                ახალმა მოწყობილობამ მოითხოვა სისტემაში შესვლა:
-            </p>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">ახალმა მოწყობილობამ მოითხოვა სისტემაში შესვლა:</p>
             <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; text-align: left; font-size: 13px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 6px;">
                 <div><strong>სახელი და გვარი:</strong> <span id="reqUsername">-</span></div>
                 <div><strong>IP მისამართი:</strong> <span id="reqIp">-</span></div>
@@ -1283,19 +1234,10 @@
     </div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyATvDjEFcDxjOiT3dEs9u5fmGQT5eIC7ao",
-        authDomain: "xelmowera-a9071.firebaseapp.com",
-        databaseURL: "https://xelmowera-a9071-default-rtdb.firebaseio.com",
-        projectId: "xelmowera-a9071",
-        storageBucket: "xelmowera-a9071.firebasestorage.app",
-        messagingSenderId: "332380909705",
-        appId: "1:332380909705:web:fcf89a6924ce779f93d658",
-        measurementId: "G-0E239LHWKZ"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const SUPABASE_URL = 'https://lgcbpklqdfpdybbbchde.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxnY2Jwa2xxZGZwZHliYmJjaGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyNzcyOTIsImV4cCI6MjEwMzg1MzI5Mn0.3EOQMNOPnCzdIwIEDYiLNC4nhEEYS1XzCPY7273UxvE';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const STORAGE_BUCKET = 'shogi-documents';
 
     const icons = {
         folder: '<svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>',
@@ -1311,7 +1253,6 @@
     let currentZoom = 1;
     let searchQuery = '';
     let currentDocumentKind = null;
-    let currentPdfObjectUrl = null;
     let pageJumpHandler = null;
     let currentPageState = { total: 0, current: 1 };
     let activeExcelWorkbook = null;
@@ -1324,15 +1265,7 @@
 
     let currentRequestIdModal = null;
     let activeLoginRequestId = null;
-
-    let mobileOpenCategory = null; // მობილურისთვის ერთდროულად გახსნილი კატეგორია
-
-    function releasePdfObjectUrl() {
-        if (currentPdfObjectUrl) {
-            URL.revokeObjectURL(currentPdfObjectUrl);
-            currentPdfObjectUrl = null;
-        }
-    }
+    let mobileOpenCategory = null;
 
     function getDeviceId() {
         let id = localStorage.getItem('shogi_device_id');
@@ -1377,16 +1310,6 @@
     function isImageFile(file) {
         const name = getFileNameLower(file);
         return (file?.type || '').includes('image') || /\.(jpg|jpeg|png|webp)$/i.test(name);
-    }
-
-    function dataUrlToUint8Array(dataUrl) {
-        const base64Data = dataUrl.split(',')[1];
-        const byteCharacters = atob(base64Data);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        return new Uint8Array(byteNumbers);
     }
 
     function escapeHtml(value) {
@@ -1535,21 +1458,24 @@
             const pageShell = getPdfPageShell(pageNumber);
             if (!pageShell || !activePdfDoc) return;
 
+            const scaleValue = 1.35 * currentZoom;
             const page = await activePdfDoc.getPage(pageNumber);
             if (version !== activePdfRenderVersion) return;
 
-            const viewport = page.getViewport({ scale: 1.35 * currentZoom });
+            const viewport = page.getViewport({ scale: scaleValue });
             const outputScale = window.devicePixelRatio || 1;
 
             pageShell.style.width = `${viewport.width}px`;
             pageShell.style.height = `${viewport.height}px`;
             pageShell.style.aspectRatio = 'auto';
-            pageShell.style.setProperty('--scale-factor', viewport.scale);
+            pageShell.style.setProperty('--scale-factor', String(scaleValue)); // <--- დაამატე ეს
 
             pageShell.innerHTML = '<canvas></canvas><div class="pdf-text-layer"></div>';
 
             const canvas = pageShell.querySelector('canvas');
             const textLayer = pageShell.querySelector('.pdf-text-layer');
+            textLayer.style.setProperty('--scale-factor', String(scaleValue)); // <--- დაამატე ეს
+            
             const context = canvas.getContext('2d');
 
             canvas.width = Math.floor(viewport.width * outputScale);
@@ -1615,8 +1541,6 @@
             viewer.querySelectorAll('.pdf-page-shell').forEach((pageShell) => {
                 pdfIntersectionObserver.observe(pageShell);
             });
-        } else {
-            renderPdfVisiblePages();
         }
 
         viewer.addEventListener('scroll', syncPdfPageFromScroll, { passive: true });
@@ -1683,9 +1607,15 @@
         return pages.length ? pages : [container];
     }
 
-    function readExcelData(file) {
-        const base64Data = file.dataUrl.split(',')[1];
-        const workbook = XLSX.read(base64Data, { type: 'base64', codepage: 65001, cellDates: true });
+    async function fetchFileArrayBuffer(url) {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        return await blob.arrayBuffer();
+    }
+
+    async function readExcelDataFromUrl(fileUrl) {
+        const buffer = await fetchFileArrayBuffer(fileUrl);
+        const workbook = XLSX.read(buffer, { type: 'array', codepage: 65001, cellDates: true });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false, defval: '' });
@@ -1754,7 +1684,7 @@
 
     function refreshData() {
         showToast('მონაცემები განახლდა', 'success');
-        initFirebaseSync();
+        fetchFilesFromSupabase();
     }
 
     async function handleLogin() {
@@ -1779,32 +1709,34 @@
 
             showWaitingScreen(requestId, user);
 
-            db.ref('login_requests/' + requestId).set({
-                deviceId: deviceId,
+            await supabaseClient.from('login_requests').insert([{
+                id: requestId,
+                device_id: deviceId,
                 username: user,
                 ip: ip,
-                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                timestamp: Date.now(),
                 status: 'pending'
-            });
+            }]);
 
-            db.ref('login_requests/' + requestId).on('value', (snapshot) => {
-                const val = snapshot.val();
-                if (!val) return;
-                if (val.status === 'approved') {
-                    db.ref('login_requests/' + requestId).off();
-                    db.ref('login_requests/' + requestId).remove();
-                    localStorage.setItem('shogi_is_master', 'true');
-                    localStorage.setItem('isLoggedIn', 'true');
-                    hideWaitingScreen();
-                    showToast('ნებართვა გაცემულია! წარმატებით შეხვედით.', 'success');
-                    showApp();
-                } else if (val.status === 'rejected') {
-                    db.ref('login_requests/' + requestId).off();
-                    db.ref('login_requests/' + requestId).remove();
-                    hideWaitingScreen();
-                    showToast('შესვლის მოთხოვნა უარყოფილია მთავარი მოწყობილობის მიერ.', 'error');
-                }
-            });
+            const channel = supabaseClient.channel('login_req_' + requestId)
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'login_requests', filter: `id=eq.${requestId}` }, (payload) => {
+                    const val = payload.new;
+                    if (val.status === 'approved') {
+                        supabaseClient.removeChannel(channel);
+                        supabaseClient.from('login_requests').delete().eq('id', requestId);
+                        localStorage.setItem('shogi_is_master', 'true');
+                        localStorage.setItem('isLoggedIn', 'true');
+                        hideWaitingScreen();
+                        showToast('ნებართვა გაცემულია! წარმატებით შეხვედით.', 'success');
+                        showApp();
+                    } else if (val.status === 'rejected') {
+                        supabaseClient.removeChannel(channel);
+                        supabaseClient.from('login_requests').delete().eq('id', requestId);
+                        hideWaitingScreen();
+                        showToast('შესვლის მოთხოვნა უარყოფილია მთავარი მოწყობილობის მიერ.', 'error');
+                    }
+                })
+                .subscribe();
 
         } else {
             showToast('არასწორი მომხმარებელი ან პაროლი!', 'error');
@@ -1824,9 +1756,9 @@
         `;
     }
 
-    function cancelLoginRequest(requestId) {
+    async function cancelLoginRequest(requestId) {
         if (requestId) {
-            db.ref('login_requests/' + requestId).remove();
+            await supabaseClient.from('login_requests').delete().eq('id', requestId);
         }
         hideWaitingScreen();
         showToast('შესვლის მოთხოვნა გაუქმდა', 'success');
@@ -1841,33 +1773,18 @@
     }
 
     function initAdminApprovalListener() {
-        db.ref('login_requests').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (!data) {
-                closeAccessModal();
-                return;
-            }
-
-            let pendingKey = null;
-            let pendingData = null;
-
-            Object.keys(data).forEach(key => {
-                if (data[key].status === 'pending') {
+        supabaseClient.channel('admin_login_listener')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'login_requests' }, (payload) => {
+                const req = payload.new;
+                if (req.status === 'pending') {
                     const myDeviceId = getDeviceId();
-                    if (data[key].deviceId !== myDeviceId) {
-                        pendingKey = key;
-                        pendingData = data[key];
+                    if (req.device_id !== myDeviceId) {
+                        currentRequestIdModal = req.id;
+                        showAccessRequestModal(req);
                     }
                 }
-            });
-
-            if (pendingKey && pendingData) {
-                currentRequestIdModal = pendingKey;
-                showAccessRequestModal(pendingData);
-            } else {
-                closeAccessModal();
-            }
-        });
+            })
+            .subscribe();
     }
 
     function showAccessRequestModal(reqData) {
@@ -1882,39 +1799,33 @@
         currentRequestIdModal = null;
     }
 
-    function approveAccessRequest() {
+    async function approveAccessRequest() {
         if (!currentRequestIdModal) return;
-        db.ref('login_requests/' + currentRequestIdModal).update({
-            status: 'approved'
-        }, (error) => {
-            if (!error) {
-                showToast('შესვლის მოთხოვნა დამტკიცდა', 'success');
-                closeAccessModal();
-            } else {
-                showToast('შეცდომა ოპერაციისას', 'error');
-            }
-        });
+        const { error } = await supabaseClient.from('login_requests').update({ status: 'approved' }).eq('id', currentRequestIdModal);
+        if (!error) {
+            showToast('შესვლის მოთხოვნა დამტკიცდა', 'success');
+            closeAccessModal();
+        } else {
+            showToast('შეცდომა ოპერაციისას', 'error');
+        }
     }
 
-    function rejectAccessRequest() {
+    async function rejectAccessRequest() {
         if (!currentRequestIdModal) return;
-        db.ref('login_requests/' + currentRequestIdModal).update({
-            status: 'rejected'
-        }, (error) => {
-            if (!error) {
-                showToast('შესვლის მოთხოვნა უარყოფილია', 'success');
-                closeAccessModal();
-            } else {
-                showToast('შეცდომა ოპერაციისას', 'error');
-            }
-        });
+        const { error } = await supabaseClient.from('login_requests').update({ status: 'rejected' }).eq('id', currentRequestIdModal);
+        if (!error) {
+            showToast('შესვლის მოთხოვნა უარყოფილია', 'success');
+            closeAccessModal();
+        } else {
+            showToast('შეცდომა ოპერაციისას', 'error');
+        }
     }
 
     function handleLogout() {
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('shogi_is_master');
         if (activeLoginRequestId) {
-            db.ref('login_requests/' + activeLoginRequestId).remove();
+            supabaseClient.from('login_requests').delete().eq('id', activeLoginRequestId);
         }
         showToast('წარმატებით გახვედით სისტემიდან', 'success');
         showLogin();
@@ -1928,25 +1839,27 @@
     function showApp() {
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('appView').classList.remove('hidden');
-        initFirebaseSync();
+        fetchFilesFromSupabase();
         initAdminApprovalListener();
+        initFilesRealtimeSync();
     }
 
-    function initFirebaseSync() {
-        db.ref('files').on('value', (snapshot) => {
-            const data = snapshot.val();
-            filesData = [];
-            if (data) {
-                Object.keys(data).forEach(key => {
-                    filesData.push({ id: key, ...data[key] });
-                });
-                
-                filesData.reverse(); 
-            }
-            renderFiles();
-        }, (error) => {
+    async function fetchFilesFromSupabase() {
+        const { data, error } = await supabaseClient.from('files').select('*').order('created_at', { ascending: false });
+        if (error) {
             showToast('მონაცემთა ბაზასთან კავშირის შეცდომა', 'error');
-        });
+            return;
+        }
+        filesData = data || [];
+        renderFiles();
+    }
+
+    function initFilesRealtimeSync() {
+        supabaseClient.channel('files_sync')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'files' }, () => {
+                fetchFilesFromSupabase();
+            })
+            .subscribe();
     }
 
     function getCategoriesList() {
@@ -2004,13 +1917,13 @@
     }
 
     function handleCategoryClick(location) {
-        if (window.innerWidth > 768) return; // კომპიუტერზე კატეგორიები მუდამ გახსნილია
-        if (searchQuery.trim() !== '') return; // ძებნის დროს კლიკით მდგომარეობა არ იცვლება
+        if (window.innerWidth > 768) return;
+        if (searchQuery.trim() !== '') return;
 
         if (mobileOpenCategory === location) {
-            mobileOpenCategory = null; // დახურვა
+            mobileOpenCategory = null;
         } else {
-            mobileOpenCategory = location; // გახსნა (სხვები ავტომატურად იხურება, რადგან ერთდროულად მხოლოდ 1 შეიძლება იყოს)
+            mobileOpenCategory = location;
         }
         renderFiles();
     }
@@ -2037,7 +1950,7 @@
         if (dropdown) dropdown.style.display = 'none';
     }
 
-    function uploadFile() {
+    async function uploadFile() {
         const titleInput = document.getElementById('fileTitle');
         const locationInput = document.getElementById('fileLocation');
         const fileInput = document.getElementById('fileInput');
@@ -2059,86 +1972,75 @@
         const progressPercent = document.getElementById('uploadPercent');
 
         uploadBtn.disabled = true;
-        uploadBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; border-top-color: white;"></div> მიმდინარეობს დამუშავება...';
+        uploadBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; border-top-color: white;"></div> მიმდინარეობს ატვირთვა...';
 
         progressContainer.classList.remove('hidden');
-        progressBar.style.width = '10%';
-        progressPercent.textContent = '10%';
+        progressBar.style.width = '30%';
+        progressPercent.textContent = '30%';
 
-        const reader = new FileReader();
+        try {
+            const fileExt = file.name.split('.').pop();
+            const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
 
-        reader.onprogress = function(event) {
-            if (event.lengthComputable) {
-                const percent = Math.round((event.loaded / event.total) * 80);
-                progressBar.style.width = percent + '%';
-                progressPercent.textContent = percent + '%';
-            }
-        };
+            const { data: storageData, error: storageError } = await supabaseClient.storage
+                .from(STORAGE_BUCKET)
+                .upload(uniqueFileName, file);
 
-        reader.onload = function(e) {
-            progressBar.style.width = '90%';
-            progressPercent.textContent = '90%';
+            if (storageError) throw storageError;
 
-            const dataUrl = e.target.result;
+            progressBar.style.width = '70%';
+            progressPercent.textContent = '70%';
+
+            const { data: { publicUrl } } = supabaseClient.storage
+                .from(STORAGE_BUCKET)
+                .getPublicUrl(uniqueFileName);
+
             let fileType = file.type;
-            const fileName = file.name.toLowerCase();
+            const fileNameLower = file.name.toLowerCase();
 
-            if (fileName.endsWith('.pdf')) {
+            if (fileNameLower.endsWith('.pdf')) {
                 fileType = 'application/pdf';
-            } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || fileName.endsWith('.csv')) {
+            } else if (fileNameLower.match(/\.xls[x]?$|\.csv$/)) {
                 fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-            } else if (fileName.endsWith('.docx')) {
+            } else if (fileNameLower.endsWith('.docx')) {
                 fileType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-            } else if (fileName.match(/\.(jpg|jpeg|webp)$/)) {
+            } else if (fileNameLower.match(/\.(jpg|jpeg|webp)$/)) {
                 fileType = 'image/jpeg';
-            } else if (fileName.endsWith('.png')) {
+            } else if (fileNameLower.endsWith('.png')) {
                 fileType = 'image/png';
             }
 
-            const newFile = {
+            const { error: dbError } = await supabaseClient.from('files').insert([{
                 title: titleInput.value,
                 location: locationInput.value.trim() || '-',
                 name: file.name,
                 type: fileType,
-                dataUrl: dataUrl
-            };
+                url: publicUrl
+            }]);
 
-            db.ref('files').push(newFile, (dbError) => {
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = 'ატვირთვა';
-                if (dbError) {
-                    showToast('ბაზაში შენახვის შეცდომა', 'error');
-                } else {
-                    progressBar.style.width = '100%';
-                    progressPercent.textContent = '100%';
-                    setTimeout(() => {
-                        closeUploadModal();
-                        showToast('ფაილი წარმატებით აიტვირთა!', 'success');
-                    }, 300);
-                }
-            });
-        };
+            if (dbError) throw dbError;
 
-        reader.onerror = function() {
+            progressBar.style.width = '100%';
+            progressPercent.textContent = '100%';
+
+            setTimeout(() => {
+                closeUploadModal();
+                showToast('ფაილი წარმატებით აიტვირთა!', 'success');
+            }, 300);
+
+        } catch (error) {
+            console.error(error);
+            showToast('ატვირთვის შეცდომა', 'error');
+        } finally {
             uploadBtn.disabled = false;
             uploadBtn.innerHTML = 'ატვირთვა';
-            progressContainer.classList.add('hidden');
-            showToast('ფაილის წაკითხვის შეცდომა', 'error');
-        };
-
-        reader.readAsDataURL(file);
+        }
     }
 
-    async function renderPdfThumbnail(dataUrl, containerElement) {
+    async function renderPdfThumbnail(fileUrl, containerElement) {
         try {
-            const base64Data = dataUrl.split(',')[1];
-            const byteCharacters = atob(base64Data);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const loadingTask = pdfjsLib.getDocument({ data: byteArray });
+            const buffer = await fetchFileArrayBuffer(fileUrl);
+            const loadingTask = pdfjsLib.getDocument({ data: buffer });
             const pdf = await loadingTask.promise;
             const page = await pdf.getPage(1);
 
@@ -2156,10 +2058,9 @@
         }
     }
 
-    function renderExcelThumbnail(dataUrl, containerElement) {
+    async function renderExcelThumbnail(fileUrl, containerElement) {
         try {
-            const tempFile = { dataUrl };
-            const { jsonData } = readExcelData(tempFile);
+            const { jsonData } = await readExcelDataFromUrl(fileUrl);
 
             if (jsonData.length > 0) {
                 let html = '<table class="preview-mini-table">';
@@ -2191,7 +2092,7 @@
         return isValidExt || isValidType;
     }
 
-    function previewFile(event) {
+    async function previewFile(event) {
         const file = event.target.files[0];
         const previewContainer = document.getElementById('uploadPreview');
 
@@ -2214,22 +2115,25 @@
             </div>
         `;
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const dataUrl = e.target.result;
-            if (file.type.includes('image') || file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
-                previewContainer.innerHTML = `<img src="${dataUrl}" alt="Preview">`;
-            } else if (file.type.includes('pdf') || file.name.endsWith('.pdf')) {
-                renderPdfThumbnail(dataUrl, previewContainer);
-            } else if (file.type.includes('sheet') || file.type.includes('excel') || file.name.match(/\.xls[x]?$|\.csv$/i)) {
-                renderExcelThumbnail(dataUrl, previewContainer);
-            } else if (file.type.includes('word') || file.type.includes('document') || file.name.endsWith('.docx')) {
-                previewContainer.innerHTML = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#0284c7">${icons.word}</div><span>Word დოკუმენტი</span></div>`;
-            } else {
-                previewContainer.innerHTML = `<div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);font-weight:500;"><div style="width:24px;height:24px;fill:#4b5563">${icons.file}</div><span>${file.name}</span></div>`;
+        if (file.type.includes('image') || file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
             }
+            reader.readAsDataURL(file);
+        } else if (file.type.includes('pdf') || file.name.endsWith('.pdf')) {
+            const tempUrl = URL.createObjectURL(file);
+            await renderPdfThumbnail(tempUrl, previewContainer);
+            URL.revokeObjectURL(tempUrl);
+        } else if (file.type.includes('sheet') || file.type.includes('excel') || file.name.match(/\.xls[x]?$|\.csv$/i)) {
+            const tempUrl = URL.createObjectURL(file);
+            await renderExcelThumbnail(tempUrl, previewContainer);
+            URL.revokeObjectURL(tempUrl);
+        } else if (file.type.includes('word') || file.type.includes('document') || file.name.endsWith('.docx')) {
+            previewContainer.innerHTML = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#0284c7">${icons.word}</div><span>Word დოკუმენტი</span></div>`;
+        } else {
+            previewContainer.innerHTML = `<div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);font-weight:500;"><div style="width:24px;height:24px;fill:#4b5563">${icons.file}</div><span>${file.name}</span></div>`;
         }
-        reader.readAsDataURL(file);
     }
 
     function renderFiles() {
@@ -2260,9 +2164,6 @@
         });
 
         for (const [location, files] of grouped.entries()) {
-            // მობილურზე თუ ძებნა მიმდინარეობს, ვხსნით ყველა იმ კატეგორიას, სადაც ფაილი მოიძებნა.
-            // წინააღმდეგ შემთხვევაში ვხსნით მხოლოდ მაშინ, თუ mobileOpenCategory ტოლია ამ კატეგორიის.
-            // კომპიუტერზე მუდამ გახსნილია.
             const isOpenOnMobile = !isMobile || (isSearching ? true : mobileOpenCategory === location);
             const arrowClass = isOpenOnMobile && isMobile ? 'mobile-category-arrow open' : 'mobile-category-arrow';
             const gridClass = isOpenOnMobile ? 'file-grid' : 'file-grid hidden';
@@ -2335,11 +2236,11 @@
             if (!box) return;
 
             if (file.type.includes('image') || file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
-                box.innerHTML = `<img src="${file.dataUrl}" alt="${file.title}">`;
+                box.innerHTML = `<img src="${file.url}" alt="${file.title}">`;
             } else if (file.type.includes('pdf') || (file.name && file.name.endsWith('.pdf'))) {
-                renderPdfThumbnail(file.dataUrl, box);
+                renderPdfThumbnail(file.url, box);
             } else if (file.type.includes('sheet') || file.type.includes('excel') || (file.name && file.name.match(/\.xls[x]?$|\.csv$/i))) {
-                renderExcelThumbnail(file.dataUrl, box);
+                renderExcelThumbnail(file.url, box);
             } else if (file.type.includes('word') || file.type.includes('document') || (file.name && file.name.endsWith('.docx'))) {
                 box.innerHTML = `<div class="file-card-preview-placeholder"><div style="width:36px;height:36px;fill:#0284c7">${icons.word}</div><span>Word</span></div>`;
             } else {
@@ -2364,7 +2265,6 @@
         activeExcelWorkbook = null;
         activeExcelSheetName = '';
         cleanupPdfViewer();
-        releasePdfObjectUrl();
         closeDownloadOptions();
         hidePageJump();
 
@@ -2398,7 +2298,7 @@
                 if (isWordFile(file)) {
                     currentDocumentKind = 'word';
                     setModalBodyMode('word');
-                    const byteArray = dataUrlToUint8Array(file.dataUrl);
+                    const buffer = await fetchFileArrayBuffer(file.url);
                     modalBody.innerHTML = `
                         <div class="word-viewer-shell">
                             <div id="zoomableContent" class="word-render-container"></div>
@@ -2407,21 +2307,16 @@
 
                     const wordContainer = document.getElementById('zoomableContent');
                     if (window.docx && typeof window.docx.renderAsync === 'function') {
-                        await window.docx.renderAsync(byteArray.buffer, wordContainer, null, {
+                        await window.docx.renderAsync(buffer, wordContainer, null, {
                             className: 'docx',
                             inWrapper: true,
-                            ignoreWidth: false,
-                            ignoreHeight: false,
-                            ignoreFonts: false,
                             breakPages: true,
                             renderHeaders: true,
                             renderFooters: true,
-                            renderFootnotes: true,
-                            renderEndnotes: true,
                             useBase64URL: true
                         });
                     } else {
-                        const result = await mammoth.convertToHtml({ arrayBuffer: byteArray.buffer });
+                        const result = await mammoth.convertToHtml({ arrayBuffer: buffer });
                         wordContainer.innerHTML = `<section class="docx" style="background:white;padding:2.5cm;max-width:21cm;width:100%;min-height:29.7cm;color:#000;line-height:1.6;">${result.value}</section>`;
                     }
 
@@ -2440,7 +2335,7 @@
                     excelSearchContainer.style.display = 'flex';
                     document.getElementById('excelSearchInput').value = '';
 
-                    const { workbook, firstSheetName, jsonData } = readExcelData(file);
+                    const { workbook, firstSheetName, jsonData } = await readExcelDataFromUrl(file.url);
                     activeExcelWorkbook = workbook;
                     activeExcelSheetName = firstSheetName;
                     modalBody.innerHTML = `<div class="excel-table-container">${buildExcelTableHtml(jsonData)}</div>`;
@@ -2449,7 +2344,7 @@
                 }
 
                 if (isImageFile(file)) {
-                    modalBody.innerHTML = `<img src="${file.dataUrl}" alt="${escapeHtml(file.title)}" id="zoomableContent" style="cursor: zoom-in;">`;
+                    modalBody.innerHTML = `<img src="${file.url}" alt="${escapeHtml(file.title)}" id="zoomableContent" style="cursor: zoom-in;">`;
                     pageInfo.textContent = `${file.name} (სურათი)`;
 
                     const imgElem = document.getElementById('zoomableContent');
@@ -2468,10 +2363,10 @@
                     currentDocumentKind = 'pdf';
                     setModalBodyMode('pdf');
 
-                    const byteArray = dataUrlToUint8Array(file.dataUrl);
+                    const buffer = await fetchFileArrayBuffer(file.url);
 
                     try {
-                        const loadingTask = pdfjsLib.getDocument({ data: byteArray });
+                        const loadingTask = pdfjsLib.getDocument({ data: buffer });
                         activePdfDoc = await loadingTask.promise;
                         const numPages = activePdfDoc.numPages;
 
@@ -2493,7 +2388,7 @@
                 }
 
                 const iframe = document.createElement('iframe');
-                iframe.src = file.dataUrl;
+                iframe.src = file.url;
                 iframe.id = 'zoomableContent';
                 iframe.style.width = '100%';
                 iframe.style.height = '100%';
@@ -2558,7 +2453,8 @@
         }
 
         const a = document.createElement('a');
-        a.href = currentActiveFile.dataUrl;
+        a.href = currentActiveFile.url;
+        a.target = '_blank';
         a.download = currentActiveFile.name || currentActiveFile.title;
         document.body.appendChild(a);
         a.click();
@@ -2566,9 +2462,9 @@
         showToast('ფაილი გადმოიწერა', 'success');
     }
 
-    function getActiveExcelData() {
+    async function getActiveExcelData() {
         if (!currentActiveFile || !isExcelFile(currentActiveFile)) return null;
-        return readExcelData(currentActiveFile);
+        return await readExcelDataFromUrl(currentActiveFile.url);
     }
 
     async function downloadExcelAsPdf() {
@@ -2640,8 +2536,8 @@
         }
     }
 
-    function downloadExcelAsWorkbook() {
-        const excelData = getActiveExcelData();
+    async function downloadExcelAsWorkbook() {
+        const excelData = await getActiveExcelData();
         if (!excelData) return;
         closeDownloadOptions();
 
@@ -2651,8 +2547,8 @@
         showToast('Excel ფაილი გადმოიწერა', 'success');
     }
 
-    function downloadExcelAsCsv() {
-        const excelData = getActiveExcelData();
+    async function downloadExcelAsCsv() {
+        const excelData = await getActiveExcelData();
         if (!excelData) return;
         closeDownloadOptions();
 
@@ -2758,7 +2654,7 @@
                         </style>
                     </head>
                     <body>
-                        <img src="${currentActiveFile.dataUrl}">
+                        <img src="${currentActiveFile.url}">
                     </body>
                     </html>
                 `);
@@ -2770,42 +2666,9 @@
                 return;
             }
 
-            const isPdf = isPdfFile(currentActiveFile);
-            if (isPdf) {
-                const base64Data = currentActiveFile.dataUrl.split(',')[1];
-                const byteCharacters = atob(base64Data);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: 'application/pdf' });
-                const blobUrl = URL.createObjectURL(blob);
-
-                let printFrame = document.getElementById('printFrame');
-                if (!printFrame) {
-                    printFrame = document.createElement('iframe');
-                    printFrame.id = 'printFrame';
-                    printFrame.style.display = 'none';
-                    document.body.appendChild(printFrame);
-                }
-                printFrame.src = blobUrl;
-                printFrame.onload = function() {
-                    setTimeout(() => {
-                        try {
-                            printFrame.contentWindow.focus();
-                            printFrame.contentWindow.print();
-                        } catch(e) {
-                            showToast('ბეჭდვა ვერ მოხერხდა', 'error');
-                        }
-                    }, 500);
-                };
-                return;
-            }
-
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
-            iframe.src = currentActiveFile.dataUrl;
+            iframe.src = currentActiveFile.url;
             document.body.appendChild(iframe);
             iframe.onload = function() {
                 setTimeout(() => {
@@ -2829,19 +2692,18 @@
         document.getElementById('deleteConfirmModal').style.display = 'none';
     }
 
-    function executeDeleteFile() {
+    async function executeDeleteFile() {
         if (!currentActiveFile) return;
         const fileId = currentActiveFile.id;
         closeDeleteConfirm();
 
-        db.ref('files/' + fileId).remove((error) => {
-            if (error) {
-                showToast('წაშლის შეცდომა', 'error');
-            } else {
-                closeModal();
-                showToast('ფაილი წარმატებით წაიშალა', 'success');
-            }
-        });
+        const { error } = await supabaseClient.from('files').delete().eq('id', fileId);
+        if (error) {
+            showToast('წაშლის შეცდომა', 'error');
+        } else {
+            closeModal();
+            showToast('ფაილი წარმატებით წაიშალა', 'success');
+        }
     }
 
     function closeModal() {
@@ -2858,7 +2720,6 @@
         cleanupPdfViewer();
         hidePageJump();
         closeDownloadOptions();
-        releasePdfObjectUrl();
     }
 </script>
 
